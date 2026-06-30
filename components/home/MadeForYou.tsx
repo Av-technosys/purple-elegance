@@ -1,50 +1,61 @@
 import Image from "next/image";
 
-
-
 export default function MadeForYou() {
   return (
     <section className="relative w-full overflow-hidden bg-[#f5e8d8]">
-      <div className="relative w-full aspect-[4/3] sm:aspect-[16/9] min-h-[420px] sm:min-h-0">
+      {/* Container aspect ratio dynamically shifted for mobile vs desktop */}
+      <div className="relative w-full min-h-[720px] sm:min-h-0 sm:aspect-[16/9]">
         
-        {/* Background Image */}
-        <Image
-          src="/madefor.png"
-          alt="Rooted in tradition collection"
-          fill
-          priority
-          className="object-cover object-center"
-          sizes="100vw"
-        />
+        {/* Mobile Background Image (As per attached layout mockup) */}
+        <div className="block sm:hidden absolute inset-0">
+          <Image
+            src="/madefor-mobile.png"
+            alt="Rooted in tradition collection mobile"
+            fill
+            priority
+            className="object-cover object-top"
+            sizes="100vw"
+          />
+        </div>
+
+        {/* Desktop Background Image (Web remains completely untouched) */}
+        <div className="hidden sm:block absolute inset-0">
+          <Image
+            src="/madefor.png"
+            alt="Rooted in tradition collection"
+            fill
+            priority
+            className="object-cover object-center"
+            sizes="100vw"
+          />
+        </div>
         
-        {/* Light overlay for readability on small screens */}
-        <div className="absolute inset-0 bg-white/10 md:bg-transparent" />
+        {/* Light overlay */}
+        <div className="absolute inset-0 bg-white/5 md:bg-transparent" />
 
-        {/* Dynamic Wrapper */}
-        <div className="absolute inset-0 mx-auto max-w-[1340px] p-4 sm:p-6 md:p-8">
+        {/* Dynamic Content Wrapper */}
+        <div className="absolute inset-0 mx-auto max-w-[1340px] p-6 sm:p-6 md:p-8">
           
-          {/* Floating Photo Labels (Visible from sm screen onwards to ensure clean mobile view) */}
-          
-
-          {/* Center/Right Content Layout */}
-          <div className="flex h-full w-full items-center justify-center md:justify-start">
+          {/* Layout Content Alignment */}
+          {/* Mobile par top-left text alignment diya hai taaki image features hide na hon */}
+          <div className="flex h-full w-full items-start justify-start sm:items-center sm:justify-center md:justify-start">
             
-            <div className="w-full max-w-[290px] text-center sm:max-w-[400px] md:ml-[45%] md:max-w-[460px] lg:max-w-[520px]">
+            <div className="w-full max-w-[240px] text-left mt-4 sm:mt-0 sm:text-center sm:max-w-[400px] md:ml-[45%] md:max-w-[460px] lg:max-w-[520px]">
               
               {/* Heading */}
-              <h2 className="font-serif text-[24px] font-semibold leading-[1.05] tracking-tight text-[#8A3E25] sm:text-[36px] md:text-[46px] lg:text-[58px]">
+              <h2 className="font-serif text-[26px] font-semibold leading-[1.1] tracking-tight text-[#8A3E25] sm:text-[36px] md:text-[46px] lg:text-[58px]">
                 ROOTED IN
                 <br />
                 TRADITION,
               </h2>
               
               {/* Script Subheading */}
-              <p className="mt-1 font-serif text-[22px] font-normal leading-none text-[#747960] italic sm:mt-2 sm:text-[34px] md:text-[44px] lg:text-[56px]">
+              <p className="mt-1 font-serif text-[26px] font-normal leading-none text-[#747960] italic sm:mt-2 sm:text-[34px] md:text-[44px] lg:text-[56px]">
                 Made for You
               </p>
 
-              {/* Decorative Top Divider */}
-              <div className="mx-auto mt-3 flex w-[100px] items-center gap-2 text-[#b98568] sm:mt-5 sm:w-[150px]">
+              {/* Decorative Top Divider (Mobile view par flex-start aur left-aligned layout) */}
+              <div className="mr-auto ml-0 sm:mx-auto mt-4 flex w-[80px] items-center gap-2 text-[#b98568] sm:mt-5 sm:w-[150px]">
                 <span className="h-[1px] flex-1 bg-[#c79c78]/60" />
                 <span className="text-[10px] sm:text-[14px]">✥</span>
                 <span className="h-[1px] flex-1 bg-[#c79c78]/60" />
@@ -56,7 +67,7 @@ export default function MadeForYou() {
               </p>
               
               {/* Decorative Bottom Divider */}
-              <div className="mx-auto mt-3 flex w-[100px] items-center gap-2 text-[#b98568] sm:mt-5 sm:w-[150px]">
+              <div className="mr-auto ml-0 sm:mx-auto mt-3 flex w-[80px] items-center gap-2 text-[#b98568] sm:mt-5 sm:w-[150px]">
                 <span className="h-[1px] flex-1 bg-[#c79c78]/60" />
                 <span className="text-[10px] sm:text-[14px]">✥</span>
                 <span className="h-[1px] flex-1 bg-[#c79c78]/60" />

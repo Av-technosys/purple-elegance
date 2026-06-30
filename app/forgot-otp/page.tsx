@@ -8,7 +8,7 @@ const otpDigits = ["0", "0", "0", "0", "0", "0"];
 export default function ForgotOtpPage() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-white px-5 py-10 text-[#2A0C00]">
-      <section className="w-full max-w-[430px]">
+      <section className="w-full max-w-107.5">
         <Link
           href="/login"
           className="mb-5 inline-flex items-center gap-2 text-[14px] text-[#4D4D4D] hover:text-[#2A0C00]"

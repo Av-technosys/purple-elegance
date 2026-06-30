@@ -1,4 +1,3 @@
-import Footer from "@/components/common/Footer";
 import BestSeller from "@/components/home/BestSeller";
 import ExploreCollection from "@/components/home/ExploreCollection";
 import FeaturedCollection from "@/components/home/FeaturedCollection";
@@ -21,7 +20,7 @@ export default function Home() {
       <MadeForYou />
       <InstagramSection />
       <StayConnected />
-      <Footer />
+   
     </main>
   );
 }

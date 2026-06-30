@@ -3,12 +3,10 @@ import Image from "next/image";
 export default function HeritageThreads() {
   return (
     <section className="relative w-full overflow-hidden bg-[#efd7bd]">
-      {/* Aspect Ratio Box: Yeh wrapper image ko perfectly 16:9 ratio mein rakhega,
-        jiski wajah se image upar ya neeche se kabhi nahi kategi.
-      */}
+     
       <div className="relative w-full aspect-[16/9] min-h-[320px] sm:min-h-0">
         
-        {/* Background Image */}
+        
         <Image
           src="/heritage-thread-bg.png"
           alt="Heritage ethnic wear collection"

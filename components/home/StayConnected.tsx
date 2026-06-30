@@ -30,7 +30,6 @@ const socialLinks = [
 export default function StayConnected() {
   return (
     <section className="relative min-h-[780px] sm:min-h-[340px] lg:min-h-[360px] overflow-hidden bg-[#f7eadb] px-5 py-12 text-center text-[#2A0C00] sm:py-12">
-      {/* Mobile Background Image */}
       <div className="block sm:hidden absolute inset-0">
         <Image
           src="/stayconnected-mobile.png"
@@ -42,7 +41,6 @@ export default function StayConnected() {
         />
       </div>
 
-      {/* Desktop Background Image */}
       <div className="hidden sm:block absolute inset-0">
         <Image
           src="/stay-connected.png"
@@ -55,8 +53,7 @@ export default function StayConnected() {
       
       <div className="absolute inset-0 bg-white/10 md:bg-transparent" />
 
-      {/* Main Content Box (Adjusted top padding for mobile to push down content perfectly as per layout) */}
-      <div className="relative mx-auto flex max-w-[520px] flex-col items-center pt-[220px] sm:pt-10">
+   <div className="relative mx-auto flex max-w-[520px] flex-col items-center pt-[300px] sm:pt-0">
         
         {/* Logo */}
         <Image
@@ -67,13 +64,10 @@ export default function StayConnected() {
           className="h-auto w-[248px] object-contain sm:w-[282px]"
         />
 
-        {/* Optional decorative divider matching image layout */}
         <div className="my-2 opacity-80 sm:hidden">
-          {/* Agar aapke paas divider ki asset ho toh laga sakte hain, nahi toh custom line */}
           <span className="text-[#7F5240] text-xs tracking-widest">♦ ⚜ ♦</span>
         </div>
 
-        {/* Main Headings */}
         <h2 className="mt-2 sm:-mt-3 max-w-[360px] text-[20px] sm:text-[18px] leading-[1.35] font-semibold tracking-[0.18em] text-[#5C3A21] sm:text-[#7F5240]">
           WEAR CONFIDENCE. <br className="sm:hidden" /> WEAR PURPLE ELEGANCE
         </h2>
@@ -87,7 +81,6 @@ export default function StayConnected() {
           STAY CONNECTED FOR UPDATES
         </h3>
 
-        {/* Input Form with specific image matched pill-rounded corner for submit button */}
         <form className="mt-5 flex h-[46px] sm:h-[39px] w-full max-w-[396px] overflow-hidden rounded-[8px] bg-[#e1cbb5]/80 sm:bg-[#efd7b7] p-1">
           <input
             type="email"
@@ -99,7 +92,6 @@ export default function StayConnected() {
           </Button>
         </form>
 
-        {/* Social Icons with perfect circular thin border */}
         <div className="mt-8 sm:mt-7 flex items-center justify-center gap-5">
           {socialLinks.map((item) => {
             const Icon = item.icon;

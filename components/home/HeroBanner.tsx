@@ -9,6 +9,7 @@ import {
 } from "@tabler/icons-react";
 
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 const benefits = [
   {
@@ -94,10 +95,12 @@ function HeroCopy({ className = "" }: { className?: string }) {
         Thoughtfully designed prints and silhouettes that bring comfort, charm
         and confidence to every moment.
       </p>
-      <Button className="mt-7 h-[42px] w-full max-w-[230px] rounded-[3px] bg-[#A8484D] px-8 text-[11px] font-semibold tracking-[0.04em] text-white hover:bg-[#913d42] sm:h-[50px] sm:max-w-[318px] sm:text-[14px]">
-        SHOP NEW ARRIVALS
-        <IconArrowRight size={17} stroke={1.7} />
-      </Button>
+      <Link href="product">
+        <Button className="mt-7 h-[42px] w-full max-w-[230px] rounded-[3px] bg-[#A8484D] px-8 text-[11px] font-semibold tracking-[0.04em] text-white hover:bg-[#913d42] sm:h-[50px] sm:max-w-[318px] sm:text-[14px]">
+          SHOP NEW ARRIVALS
+          <IconArrowRight size={17} stroke={1.7} />
+        </Button>
+      </Link>
       <div className="mx-auto mt-7 hidden w-[86px] items-center gap-3 text-[#b8896e] md:flex">
         <span className="h-px flex-1 bg-[#d2ad95]" />
         <span className="text-[13px] leading-none">✤</span>
