@@ -6,6 +6,7 @@ import Image from "next/image";
 import { IconArrowLeft, IconArrowRight } from "@tabler/icons-react";
 
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 const collections = [
   {
@@ -169,10 +170,13 @@ export default function FeaturedCollection() {
                     </p>
 
                     {isActive ? (
-                      <Button className="mt-7 h-[42px] rounded-[4px] bg-[#fff2df] px-7 text-[10px] font-semibold text-[#2A0C00] hover:bg-white">
+                      <Link
+                        href="/product"
+                        className="mt-7 inline-flex h-[42px] items-center gap-2 rounded-[4px] bg-[#fff2df] px-7 text-[10px] font-semibold tracking-wider text-[#2A0C00] transition-colors hover:bg-white"
+                      >
                         EXPLORE COLLECTION
                         <IconArrowRight size={14} stroke={1.8} />
-                      </Button>
+                      </Link>
                     ) : null}
                   </div>
                 </article>

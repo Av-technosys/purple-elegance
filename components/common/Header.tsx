@@ -11,6 +11,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 import HeaderAccount, { HeaderAccountUser } from "@/components/common/HeaderAccount";
+import Link from "next/link";
 
 const mockUser: HeaderAccountUser = {
   name: "John Doe",
@@ -33,10 +34,12 @@ const menuItems = [
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const accountUser = isMockLoggedIn ? mockUser : null;
 
   const closeMenu = () => setIsMenuOpen(false);
   const toggleMenu = () => setIsMenuOpen((prev) => !prev);
+  const toggleSearch = () => setIsSearchOpen((prev) => !prev);
 
   useEffect(() => {
     if (!isMenuOpen) {
@@ -64,7 +67,7 @@ const Header = () => {
     <>
       <header className="fixed inset-x-0 top-0 z-50 h-[60px] bg-transparent text-[#140A05] md:h-[68px] md:bg-white/30 md:shadow-[0_4px_18px_rgba(42,12,0,0.05)] md:backdrop-blur-sm">
         <div className="mx-auto grid h-full max-w-[1672px] grid-cols-3 items-center px-2 sm:px-5 md:px-[135px]">
-          <nav className="flex h-full items-center gap-2 sm:gap-4">
+          <nav className="relative flex h-full items-center gap-2 sm:gap-4">
             <button
               type="button"
               aria-label="Open menu"
@@ -75,17 +78,31 @@ const Header = () => {
             >
               <IconMenu2 size={25} stroke={2} />
             </button>
-            <button
-              type="button"
-              aria-label="Search"
-              className="flex size-7 items-center justify-center md:size-8"
-            >
-              <IconSearch size={25} stroke={2} />
-            </button>
+            <div className="relative flex items-center">
+              <button
+                type="button"
+                aria-label="Search"
+                aria-expanded={isSearchOpen}
+                onClick={toggleSearch}
+                className="flex size-7 items-center justify-center md:size-8"
+              >
+                <IconSearch size={25} stroke={2} />
+              </button>
+              <input
+                type="text"
+                placeholder="Search products..."
+                aria-hidden={!isSearchOpen}
+                className={`absolute left-full rounded-3xl top-1/2 z-10 max-w-[220px] -translate-y-1/2 border border-gray-200 bg-white px-3 py-2 text-[12px] font-sans text-[#2A0C00] outline-none transition-all duration-300 ${
+                  isSearchOpen
+                    ? "w-[220px] opacity-100 pointer-events-auto"
+                    : "w-0 opacity-0 pointer-events-none"
+                }`}
+              />
+            </div>
           </nav>
 
           <a
-            href="#"
+            href="/"
             className="flex h-full items-center justify-center overflow-hidden"
             aria-label="Purple Elegance home"
           >
@@ -107,13 +124,10 @@ const Header = () => {
             >
               <IconHeart size={25} stroke={2} />
             </button>
-            <button
-              type="button"
-              aria-label="Shopping bag"
-              className="flex size-7 items-center justify-center md:size-8"
-            >
+
+            <Link href="/cart" aria-label="Shopping bag" className="flex size-7 items-center justify-center md:size-8">
               <IconShoppingBag size={25} stroke={2} />
-            </button>
+            </Link>
           </nav>
         </div>
       </header>
