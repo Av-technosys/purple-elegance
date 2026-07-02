@@ -169,12 +169,12 @@ const Header = () => {
                 SHOP
               </h2>
               <span className="mt-4 block h-px w-[48px] bg-[#351300]" />
-              <div className="mt-5 divide-y divide-[#C9C0BA]">
+              <div className="mt-7  divide-y  divide-[#C9C0BA]">
                 {menuItems.map((item) => (
                   <a
                     key={item}
-                    href="#"
-                    className="block py-[9px] text-[12px] leading-none font-medium"
+                    href="/"
+                    className="block py-6 text-[16px] leading-none font-medium"
                   >
                     {item}
                   </a>
