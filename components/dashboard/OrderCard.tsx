@@ -18,7 +18,7 @@ const statusColors = {
 
 export function OrderCard({ order }: OrderCardProps) {
   return (
-    <div className="rounded-[10px]border border-zinc-200 bg-white p-5 shadow-sm">
+    <div className="rounded-[10px] border border-zinc-200 bg-white p-5 shadow-sm">
       <div className="flex items-center justify-between gap-3">
         <div>
           <p className="text-sm font-semibold text-zinc-950">{order.id}</p>

@@ -41,11 +41,12 @@ export default function HeaderAccount({
   return (
     <div className="grid grid-cols-2 gap-0">
      
-      <Button className="h-[35px] rounded-none bg-[#351300] text-[12px] font-semibold text-white hover:bg-[#4A1B04]">
+      <Button asChild className="h-[35px] rounded-none bg-[#351300] text-[12px] font-semibold text-white hover:bg-[#4A1B04]">
         <Link href={"/login"}> Login</Link>
       </Button>
   
       <Button
+        asChild
         variant="outline"
         className="h-[35px] rounded-none border-[#351300] bg-white text-[12px] font-semibold text-[#140A05] hover:bg-[#F8EAD8]"
       >

@@ -74,7 +74,51 @@ export function DashboardOrderCard({ order }: DashboardOrderCardProps) {
           </button>
         </div>
       </div>
-     
+
+      {order.showTrack && (
+        <div className="mt-6 border-t border-zinc-200 pt-6 text-left">
+          <div className="text-[11px] font-bold uppercase tracking-[0.16em] text-zinc-800 mb-5">
+            Estimated Delivery: {order.estimate || "Oct 19"}
+          </div>
+          
+          <div className="relative pl-6 space-y-6 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-[1.5px] before:bg-zinc-200">
+            {/* Step 1 */}
+            <div className="relative">
+              <span className="absolute -left-[22px] top-1 h-3 w-3 rounded-full bg-emerald-600 flex items-center justify-center">
+                <span className="h-1 w-1 rounded-full bg-white"></span>
+              </span>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h5 className="text-[12px] font-bold text-zinc-900 uppercase tracking-wider">Shipped</h5>
+                  <span className="text-[10px] text-zinc-400 font-medium font-sans">Oct 15, 14:30</span>
+                </div>
+                <p className="text-[11px] text-zinc-500 mt-1 leading-normal">
+                  {order.description || "In transit from Warehouse - Milan, IT"}
+                </p>
+              </div>
+            </div>
+            
+            {/* Step 2 */}
+            <div className="relative">
+              <span className="absolute -left-[22px] top-1 h-3 w-3 rounded-full bg-emerald-600 flex items-center justify-center">
+                <span className="h-1 w-1 rounded-full bg-white"></span>
+              </span>
+              <div>
+                <h5 className="text-[12px] font-bold text-zinc-900 uppercase tracking-wider">Out For Delivery</h5>
+                <p className="text-[11px] text-zinc-500 mt-0.5 leading-normal">Expected Oct 19</p>
+              </div>
+            </div>
+            
+            {/* Step 3 */}
+            <div className="relative">
+              <span className="absolute -left-[22px] top-1 h-3 w-3 rounded-full bg-white border-2 border-zinc-300 flex items-center justify-center"></span>
+              <div>
+                <h5 className="text-[12px] font-bold text-zinc-400 uppercase tracking-wider">Delivered</h5>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </article>
   )
 }

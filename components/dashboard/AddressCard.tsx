@@ -24,7 +24,7 @@ export function AddressCard({
   typeLabel,
 }: AddressCardProps) {
   return (
-    <div className="rounded-[10px]border border-zinc-200 bg-white p-6 shadow-sm">
+    <div className="rounded-[10px] border border-zinc-200 bg-white p-6 shadow-sm">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <span className="text-xs font-semibold uppercase tracking-[0.3em] text-zinc-500">{label}</span>

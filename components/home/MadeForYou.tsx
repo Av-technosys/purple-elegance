@@ -1,4 +1,7 @@
-import Image from "next/image";
+"use client"
+
+import Image from "next/image"
+import { motion } from "framer-motion"
 
 export default function MadeForYou() {
   return (
@@ -40,7 +43,13 @@ export default function MadeForYou() {
           {/* Mobile par top-left text alignment diya hai taaki image features hide na hon */}
           <div className="flex h-full w-full items-start justify-start sm:items-center sm:justify-center md:justify-start">
             
-            <div className="w-full max-w-[240px] text-left mt-4 sm:mt-0 sm:text-center sm:max-w-[400px] md:ml-[45%] md:max-w-[460px] lg:max-w-[520px]">
+            <motion.div
+              initial={{ opacity: 0, y: 25 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.8, ease: [0.215, 0.61, 0.355, 1] as const }}
+              className="w-full max-w-[240px] text-left mt-4 sm:mt-0 sm:text-center sm:max-w-[400px] md:ml-[45%] md:max-w-[460px] lg:max-w-[520px]"
+            >
               
               {/* Heading */}
               <h2 className="font-serif text-[26px] font-semibold leading-[1.1] tracking-tight text-[#8A3E25] sm:text-[36px] md:text-[46px] lg:text-[58px]">
@@ -73,10 +82,10 @@ export default function MadeForYou() {
                 <span className="h-[1px] flex-1 bg-[#c79c78]/60" />
               </div>
 
-            </div>
+            </motion.div>
           </div>
         </div>
       </div>
     </section>
-  );
+  )
 }

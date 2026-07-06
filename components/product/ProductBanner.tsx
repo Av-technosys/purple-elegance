@@ -15,7 +15,7 @@ export default function ProductBanner() {
         <BannerCopy className="absolute top-[34%] left-[8.1%]" />
       </div>
 
-      <div className="relative h-[418px] md:hidden">
+      <div className="relative h-[752px] md:hidden">
         <Image
           src="/shopbanner-mobile.png"
           alt="Woman wearing Purple Elegance embroidered suit"
@@ -39,7 +39,7 @@ function BannerCopy({ className = "" }: { className?: string }) {
       <p className="font-heading -mt-1 text-[42px] leading-none font-normal text-[#A8484D] italic md:-mt-3 md:text-[70px]">
         Collection
       </p>
-      <div className="mt-12 md:mt-10">
+      <div className="mt-6 md:mt-6">
         <p className="text-[17px] leading-none font-semibold tracking-normal md:text-[23px]">
           Elevate Your Everyday Style.
         </p>

@@ -17,7 +17,7 @@ interface OrderTableProps {
 export function OrderTable({ orders }: OrderTableProps) {
   return (
     <div className="space-y-4">
-      <div className="hidden overflow-hidden rounded-[10px]border border-zinc-200 bg-white shadow-sm sm:block">
+      <div className="hidden overflow-hidden rounded-[10px] border border-zinc-200 bg-white shadow-sm sm:block">
         <table className="min-w-full border-separate border-spacing-0">
           <thead className="bg-zinc-50 text-left text-xs uppercase tracking-[0.32em] text-zinc-500">
             <tr>
