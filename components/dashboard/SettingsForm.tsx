@@ -12,7 +12,7 @@ export function SettingsForm() {
   const [promoEmails, setPromoEmails] = useState(false)
 
   return (
-    <div className="w-full bg-white max-w-4xl mx-auto px-4 py-8 space-y-12 text-[#111111] antialiased font-sans">
+    <div className="w-full space-y-12 text-[#111111] antialiased font-sans">
       
       {/* ================= SECTION 1: PERSONAL INFORMATION ================= */}
       <section className="pb-8 border-b border-gray-100">
@@ -233,7 +233,7 @@ export function SettingsForm() {
           {/* Order Updates preference row */}
           <div className="flex items-center justify-between gap-6 py-2">
             <div className="flex flex-col text-left">
-              <h4 className="text-[12px] font-bold uppercase tracking-wider text-gray-900">
+              <h4 className="text-[12px] font-bold uppercase tracking-wider text-gray-900 font-sans">
                 ORDER UPDATES
               </h4>
               <p className="text-[12px] text-gray-500 font-medium mt-1 leading-snug">
@@ -260,7 +260,7 @@ export function SettingsForm() {
           {/* Promotional Emails preference row */}
           <div className="flex items-center justify-between gap-6 py-2">
             <div className="flex flex-col text-left">
-              <h4 className="text-[12px] font-bold uppercase tracking-wider text-gray-900">
+              <h4 className="text-[12px] font-bold uppercase tracking-wider text-gray-900 font-sans">
                 PROMOTIONAL EMAILS
               </h4>
               <p className="text-[12px] text-gray-500 font-medium mt-1 leading-snug">

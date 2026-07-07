@@ -126,11 +126,18 @@ export default function FeaturedCollection() {
                 "2": "360px",
               }[String(offset)];
 
+              const roundingStyle =
+                offset < 0
+                  ? "8px 0 0 8px"
+                  : offset > 0
+                    ? "0 8px 8px 0"
+                    : "8px";
+
               return (
                 <article
                   key={collection.title}
                   className={[
-                    "absolute top-1/2 left-1/2 overflow-hidden rounded-[8px] bg-[#cda985] shadow-[0_9px_18px_rgba(42,12,0,0.34)] transition-[height,width,transform,opacity] duration-500 ease-out [transform:translate(calc(-50%+var(--card-x-mobile)),-50%)] sm:[transform:translate(calc(-50%+var(--card-x)),-50%)]",
+                    "absolute top-1/2 left-1/2 overflow-hidden bg-[#cda985] shadow-[0_9px_18px_rgba(42,12,0,0.34)] transition-[height,width,transform,opacity,border-radius] duration-500 ease-out [transform:translate(calc(-50%+var(--card-x-mobile)),-50%)] sm:[transform:translate(calc(-50%+var(--card-x)),-50%)]",
                     isActive
                       ? "z-10 h-[330px] w-[245px] sm:h-[438px] sm:w-[352px]"
                       : isInnerCard
@@ -141,6 +148,7 @@ export default function FeaturedCollection() {
                     {
                       "--card-x": xPositionByOffset,
                       "--card-x-mobile": mobileXPositionByOffset,
+                      borderRadius: roundingStyle,
                     } as CSSProperties
                   }
                 >

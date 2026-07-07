@@ -63,7 +63,7 @@ export default function InstagramSection() {
               viewport={{ once: true, margin: "-20px" }}
               transition={{ duration: 0.4, delay: index * 0.05, ease: "easeOut" }}
               key={`${post.alt}-${index}`}
-              className="relative flex-shrink-0 w-[204px] sm:w-auto snap-center aspect-[204/161] overflow-hidden rounded-[10px] bg-[#ead0b0]"
+              className="relative flex-shrink-0 w-[204px] sm:w-auto snap-center aspect-[3/4] overflow-hidden rounded-[10px] bg-[#ead0b0]"
             >
               <Image
                 src={post.source}
