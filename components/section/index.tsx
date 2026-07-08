@@ -1,0 +1,6 @@
+export { default as SectionHero } from "./SectionHero"
+export { default as StorySection } from "./StorySection"
+export { default as PhilosophySection } from "./PhilosophySection"
+export { default as TeamSection } from "./TeamSection"
+export { default as StatsSection } from "./StatsSection"
+export { default as CraftSection } from "./CraftSection"

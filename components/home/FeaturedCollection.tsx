@@ -4,6 +4,7 @@ import type { CSSProperties } from "react";
 import { useState } from "react";
 import Image from "next/image";
 import { IconArrowLeft, IconArrowRight } from "@tabler/icons-react";
+import { motion } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -74,16 +75,28 @@ export default function FeaturedCollection() {
       />
 
       <div className="relative mx-auto max-w-[1220px] px-5">
-        <div className="text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, ease: [0.215, 0.61, 0.355, 1] }}
+          className="text-center"
+        >
           <h2 className="text-[32px] leading-none font-semibold text-black sm:text-[38px]">
             Featured Collection
           </h2>
           <p className="mt-3 text-[14px] text-[#5B5148]">
             Discover our most-loved pieces, crafted for every occasion.
           </p>
-        </div>
+        </motion.div>
 
-        <div className="relative mt-8 sm:mt-9 lg:mt-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-40px" }}
+          transition={{ duration: 0.8, delay: 0.1, ease: [0.215, 0.61, 0.355, 1] as const }}
+          className="relative mt-8 sm:mt-9 lg:mt-8"
+        >
           <Button
             type="button"
             aria-label="Previous collection"
@@ -113,11 +126,18 @@ export default function FeaturedCollection() {
                 "2": "360px",
               }[String(offset)];
 
+              const roundingStyle =
+                offset < 0
+                  ? "8px 0 0 8px"
+                  : offset > 0
+                    ? "0 8px 8px 0"
+                    : "8px";
+
               return (
                 <article
                   key={collection.title}
                   className={[
-                    "absolute top-1/2 left-1/2 overflow-hidden rounded-[8px] bg-[#cda985] shadow-[0_9px_18px_rgba(42,12,0,0.34)] transition-[height,width,transform,opacity] duration-500 ease-out [transform:translate(calc(-50%+var(--card-x-mobile)),-50%)] sm:[transform:translate(calc(-50%+var(--card-x)),-50%)]",
+                    "absolute top-1/2 left-1/2 overflow-hidden bg-[#cda985] shadow-[0_9px_18px_rgba(42,12,0,0.34)] transition-[height,width,transform,opacity,border-radius] duration-500 ease-out [transform:translate(calc(-50%+var(--card-x-mobile)),-50%)] sm:[transform:translate(calc(-50%+var(--card-x)),-50%)]",
                     isActive
                       ? "z-10 h-[330px] w-[245px] sm:h-[438px] sm:w-[352px]"
                       : isInnerCard
@@ -128,6 +148,7 @@ export default function FeaturedCollection() {
                     {
                       "--card-x": xPositionByOffset,
                       "--card-x-mobile": mobileXPositionByOffset,
+                      borderRadius: roundingStyle,
                     } as CSSProperties
                   }
                 >
@@ -192,7 +213,7 @@ export default function FeaturedCollection() {
           >
             <IconArrowRight size={22} stroke={1.8} />
           </Button>
-        </div>
+        </motion.div>
 
         <div className="mt-6 flex justify-center gap-2">
           {collections.map((collection, index) => (

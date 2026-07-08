@@ -1,11 +1,24 @@
-import React from 'react'
+import React from "react"
+import {
+  SectionHero,
+  StorySection,
+  PhilosophySection,
+  TeamSection,
+  StatsSection,
+  CraftSection,
+} from "@/components/section"
 
-const page = () => {
+const AboutPage = () => {
   return (
-    <div>
-      about page
-    </div>
+    <main>
+      <SectionHero />
+      <StorySection />
+      <PhilosophySection />
+      <TeamSection />
+      <StatsSection />
+      <CraftSection />
+    </main>
   )
 }
 
-export default page
+export default AboutPage

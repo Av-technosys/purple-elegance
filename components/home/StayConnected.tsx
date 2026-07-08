@@ -1,3 +1,5 @@
+"use client"
+
 import Image from "next/image";
 import {
   IconBrandFacebook,
@@ -5,6 +7,7 @@ import {
   IconBrandX,
   IconMailFilled,
 } from "@tabler/icons-react";
+import { motion } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
 
@@ -48,13 +51,19 @@ export default function StayConnected() {
           fill
           className="object-cover object-center"
           sizes="100vw"
+          priority
         />
       </div>
       
       <div className="absolute inset-0 bg-white/10 md:bg-transparent" />
 
-   <div className="relative mx-auto flex max-w-[520px] flex-col items-center pt-[300px] sm:pt-0">
-        
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-40px" }}
+        transition={{ duration: 0.8, ease: [0.215, 0.61, 0.355, 1] }}
+        className="relative mx-auto flex max-w-[520px] flex-col items-center pt-[300px] sm:pt-0"
+      >
         {/* Logo */}
         <Image
           src="/main-logo.png"
@@ -108,7 +117,7 @@ export default function StayConnected() {
             );
           })}
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 }

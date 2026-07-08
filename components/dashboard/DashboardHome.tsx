@@ -62,7 +62,7 @@ export function DashboardHome() {
         title="Dashboard"
         description="Welcome back, Alexander. Here is a summary of your premium account activity and recent acquisitions."
       />
-      <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (
           <DashboardStatCard
             key={stat.label}

@@ -1,4 +1,6 @@
-import Image from "next/image";
+"use client"
+
+import Image from "next/image"
 import {
   IconArrowRight,
   IconFlower,
@@ -6,10 +8,11 @@ import {
   IconLeaf,
   IconRefresh,
   IconShieldLock,
-} from "@tabler/icons-react";
+} from "@tabler/icons-react"
+import { motion } from "framer-motion"
 
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { Button } from "@/components/ui/button"
+import Link from "next/link"
 
 const benefits = [
   {
@@ -37,7 +40,29 @@ const benefits = [
     text: "Safe, trusted & encrypted payment options",
     icon: IconShieldLock,
   },
-];
+]
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.12,
+    },
+  },
+}
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 15 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+      ease: [0.215, 0.61, 0.355, 1] as const,
+    },
+  },
+}
 
 export default function HeroBanner() {
   return (
@@ -74,49 +99,59 @@ export default function HeroBanner() {
         </div>
       </div>
     </section>
-  );
+  )
 }
 
 function HeroCopy({ className = "" }: { className?: string }) {
   return (
-    <div className={`text-center ${className}`}>
-      <p className="flex items-center justify-center gap-2 text-[10px] font-bold tracking-[0.08em] text-[#5F4B35] sm:text-[12px]">
+    <motion.div
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+      className={`text-center ${className}`}
+    >
+      <motion.p variants={itemVariants} className="flex items-center justify-center gap-2 text-[10px] font-bold tracking-[0.08em] text-[#5F4B35] sm:text-[12px]">
         <IconArrowRight size={14} stroke={1.4} />
         EFFORTLESS ELEGANCE
         <IconArrowRight size={14} stroke={1.4} className="rotate-180" />
-      </p>
-      <span className="mx-auto mt-3 block size-1.5 rounded-full bg-[#2A0C00]" />
-      <h1 className="mt-3 text-[38px] leading-[0.98] font-semibold tracking-[-0.025em] text-[#3A1A12] sm:text-[58px] lg:text-[76px]">
+      </motion.p>
+      <motion.span variants={itemVariants} className="mx-auto mt-3 block size-1.5 rounded-full bg-[#2A0C00]" />
+      <motion.h1 variants={itemVariants} className="mt-3 text-[38px] leading-[0.98] font-semibold tracking-[-0.025em] text-[#3A1A12] sm:text-[58px] lg:text-[76px]">
         Effortless Style,
         <br />
         <span className="text-[#A8484D]">Everyday You.</span>
-      </h1>
-      <p className="mx-auto mt-5 max-w-[360px] text-[12px] leading-5 text-[#4E3E34] sm:text-[14px] sm:leading-6">
+      </motion.h1>
+      <motion.p variants={itemVariants} className="mx-auto mt-5 max-w-[360px] text-[12px] leading-5 text-[#4E3E34] sm:text-[14px] sm:leading-6">
         Thoughtfully designed prints and silhouettes that bring comfort, charm
         and confidence to every moment.
-      </p>
-      <Link href="product">
-        <Button className="mt-7 h-[42px] w-full max-w-[230px] rounded-[3px] bg-[#A8484D] px-8 text-[11px] font-semibold tracking-[0.04em] text-white hover:bg-[#913d42] sm:h-[50px] sm:max-w-[318px] sm:text-[14px]">
-          SHOP NEW ARRIVALS
-          <IconArrowRight size={17} stroke={1.7} />
-        </Button>
-      </Link>
-      <div className="mx-auto mt-7 hidden w-[86px] items-center gap-3 text-[#b8896e] md:flex">
+      </motion.p>
+      <motion.div variants={itemVariants}>
+        <Link href="product">
+          <Button className="mt-7 h-[42px] w-full max-w-[230px] rounded-[3px] bg-[#A8484D] px-8 text-[11px] font-semibold tracking-[0.04em] text-white hover:bg-[#913d42] sm:h-[50px] sm:max-w-[318px] sm:text-[14px]">
+            SHOP NEW ARRIVALS
+            <IconArrowRight size={17} stroke={1.7} />
+          </Button>
+        </Link>
+      </motion.div>
+      <motion.div variants={itemVariants} className="mx-auto mt-7 hidden w-[86px] items-center gap-3 text-[#b8896e] md:flex">
         <span className="h-px flex-1 bg-[#d2ad95]" />
         <span className="text-[13px] leading-none">✤</span>
         <span className="h-px flex-1 bg-[#d2ad95]" />
-      </div>
-    </div>
-  );
+      </motion.div>
+    </motion.div>
+  )
 }
 
 function BenefitStrip({ className = "" }: { className?: string }) {
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, delay: 0.6, ease: [0.215, 0.61, 0.355, 1] as const }}
       className={`mt-8 grid grid-cols-5 gap-0 rounded-none border-0 bg-transparent px-0 py-0 shadow-none backdrop-blur-none md:mt-0 md:rounded-[14px] md:border md:border-[#ead8c8] md:bg-[#fbf3e9]/78 md:px-6 md:py-5 md:shadow-[0_10px_24px_rgba(42,12,0,0.06)] md:backdrop-blur-[2px] ${className}`}
     >
       {benefits.map((benefit, index) => {
-        const Icon = benefit.icon;
+        const Icon = benefit.icon
 
         return (
           <div
@@ -136,8 +171,8 @@ function BenefitStrip({ className = "" }: { className?: string }) {
               {benefit.text}
             </p>
           </div>
-        );
+        )
       })}
-    </div>
-  );
+    </motion.div>
+  )
 }

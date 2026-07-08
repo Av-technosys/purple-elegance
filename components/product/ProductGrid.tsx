@@ -1,6 +1,9 @@
+"use client"
+
 import Image from "next/image";
 import Link from "next/link";
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
+import { motion } from "framer-motion";
 
 import { Product, products } from "@/components/product/product-data";
 
@@ -19,8 +22,8 @@ export default function ProductGrid() {
       </div>
 
       <div className="mt-0 grid grid-cols-2 gap-x-3 gap-y-6 md:mt-4 md:grid-cols-3 md:gap-x-5 md:gap-y-8 lg:grid-cols-4">
-        {products.map((product) => (
-          <ProductCard key={product.slug} product={product} />
+        {products.map((product, index) => (
+          <ProductCard key={product.slug} product={product} index={index} />
         ))}
       </div>
 
@@ -29,32 +32,39 @@ export default function ProductGrid() {
   );
 }
 
-function ProductCard({ product }: { product: Product }) {
+function ProductCard({ product, index }: { product: Product; index: number }) {
   return (
-    <Link
-      href={`/products/${product.slug}`}
-      className="group block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A0C00]"
+    <motion.div
+      initial={{ opacity: 0, y: 15 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration: 0.5, delay: (index % 4) * 0.05, ease: [0.215, 0.61, 0.355, 1] }}
     >
-      <article>
-        <div className="relative aspect-[183/274] overflow-hidden bg-[#E8CCAA]">
-          <Image
-            src={product.image}
-            alt={product.name}
-            fill
-            className={`object-cover transition-transform duration-500 group-hover:scale-105 ${product.imagePosition}`}
-            sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 206px"
-          />
-        </div>
-        <div className="pt-2 text-[#2A0C00] md:pt-3">
-          <h3 className="text-[10px] leading-tight font-medium md:text-[12px]">
-            {product.name}
-          </h3>
-          <p className="mt-1 text-[10px] leading-none md:text-[12px]">
-            {product.price}
-          </p>
-        </div>
-      </article>
-    </Link>
+      <Link
+        href={`/products/${product.slug}`}
+        className="group block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A0C00]"
+      >
+        <article>
+          <div className="relative aspect-[183/274] overflow-hidden bg-[#E8CCAA]">
+            <Image
+              src={product.image}
+              alt={product.name}
+              fill
+              className={`object-cover transition-transform duration-500 group-hover:scale-105 ${product.imagePosition}`}
+              sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 206px"
+            />
+          </div>
+          <div className="pt-2 text-[#2A0C00] md:pt-3">
+            <h3 className="text-[10px] leading-tight font-medium md:text-[12px]">
+              {product.name}
+            </h3>
+            <p className="mt-1 text-[10px] leading-none md:text-[12px]">
+              {product.price}
+            </p>
+          </div>
+        </article>
+      </Link>
+    </motion.div>
   );
 }
 

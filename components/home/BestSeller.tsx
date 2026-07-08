@@ -1,6 +1,9 @@
+"use client"
+
 import Image from "next/image";
 import Link from "next/link";
 import { IconHeart } from "@tabler/icons-react";
+import { motion } from "framer-motion";
 
 const products = [
   {
@@ -58,8 +61,8 @@ export default function BestSeller() {
             customers.
           </p>
           <Link
-            href="#"
-            className="mt-4 inline-block text-[13px] font-bold underline underline-offset-2 sm:absolute sm:top-3 sm:right-0 sm:mt-0"
+            href="/product"
+            className="mt-4 block w-full text-right text-[13px] font-bold underline underline-offset-2 sm:absolute sm:top-3 sm:right-0 sm:w-auto sm:mt-0"
           >
             VIEW ALL
           </Link>
@@ -67,13 +70,20 @@ export default function BestSeller() {
 
         <div className="mt-7 grid grid-cols-2 gap-x-[10px] gap-y-7 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
           {products.map((product, index) => (
-            <article key={`${product.name}-${index}`} className="group">
+            <motion.article
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.5, delay: (index % 5) * 0.06, ease: [0.215, 0.61, 0.355, 1] }}
+              key={`${product.name}-${index}`}
+              className="group"
+            >
               <div className="relative aspect-[236/331] overflow-hidden bg-[#ead0b0]">
                 <Image
                   src="/sample-product.png"
                   alt={product.name}
                   fill
-                  className={`object-cover transition-transform duration-500 group-hover:scale-105 ${product.position}`}
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
                   sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 216px"
                 />
                 <button
@@ -92,7 +102,7 @@ export default function BestSeller() {
                   ₹1,099
                 </p>
               </div>
-            </article>
+            </motion.article>
           ))}
         </div>
       </div>
