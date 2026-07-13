@@ -4,7 +4,7 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 const defaultUploadExpiresIn = 60
 
 function getS3Region() {
-  return process.env.S3_AWS_REGION ?? process.env.AWS_REGION ?? 'ap-south-1'
+  return process.env.S3_AWS_REGION || process.env.AWS_REGION || 'ap-south-1'
 }
 
 function getS3BucketName() {
