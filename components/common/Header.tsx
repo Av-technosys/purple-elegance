@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import HeaderAccount, { HeaderAccountUser } from "@/components/common/HeaderAccount";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 
 const mockUser: HeaderAccountUser = {
@@ -34,6 +35,7 @@ const menuItems = [
 ];
 
 const Header = () => {
+  const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [allowClose, setAllowClose] = useState(false);
@@ -64,6 +66,7 @@ const Header = () => {
     };
   }, []);
 
+  
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 10) {
@@ -240,20 +243,27 @@ const Header = () => {
             <HeaderAccount user={accountUser} />
 
             <div className="mt-7 grid grid-cols-3 gap-7">
-              {audienceTabs.map((tab, index) => (
-                <button
-                  key={tab}
-                  type="button"
-                  className={[
-                    "h-[26px] rounded-[3px] border border-[#351300] text-[11px] font-semibold",
-                    index === 0
-                      ? "bg-[#351300] text-white"
-                      : "bg-white text-[#140A05]",
-                  ].join(" ")}
-                >
-                  {tab}
-                </button>
-              ))}
+              {audienceTabs.map((tab) => {
+                const isActive = pathname === `/${tab.toLowerCase()}`;
+                return (
+                  <Link
+                    key={tab}
+                    href={`/${tab.toLowerCase()}`}
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      setAllowClose(false);
+                    }}
+                    className={[
+                      "h-[26px] rounded-[3px] border border-[#351300] text-[11px] font-semibold flex items-center justify-center transition-all",
+                      isActive
+                        ? "bg-[#351300] text-white"
+                        : "bg-white text-[#140A05] hover:bg-slate-50",
+                    ].join(" ")}
+                  >
+                    {tab}
+                  </Link>
+                );
+              })}
             </div>
 
             <nav className="mt-8" aria-label="Drawer navigation">
