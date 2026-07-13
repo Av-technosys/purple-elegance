@@ -1,5 +1,5 @@
 import { db } from "@/server/db"
-import { products, productImages } from "./product.schema"
+import { products, productImages, productAttributes } from "./product.schema"
 import { categories } from "../category/category.schema"
 import { eq, ilike, or, count, desc, and } from "drizzle-orm"
 import type { NewProduct, UpdateProduct, NewProductImage } from "./product.types"
@@ -101,13 +101,26 @@ export const productRepository = {
     }
   },
 
-  // ── FIND BY ID (with images and variants) ───────────────────────────────────
+  // ── FIND BY ID (with images, variants, attributes) ───────────────────────────────────
   findById: async (id: string) => {
     return db.query.products.findFirst({
       where: eq(products.id, id),
       with: {
         images: true,
         variants: true,
+        attributes: { orderBy: (a, { asc }) => [asc(a.sortOrder)] },
+      },
+    })
+  },
+
+  // ── FIND BY SLUG (with images, variants, attributes) ────────────────────────────
+  findBySlug: async (slug: string) => {
+    return db.query.products.findFirst({
+      where: eq(products.slug, slug),
+      with: {
+        images: true,
+        variants: true,
+        attributes: { orderBy: (a, { asc }) => [asc(a.sortOrder)] },
       },
     })
   },
@@ -137,6 +150,25 @@ export const productRepository = {
         isPrimary: index === 0, // First image is primary
       }))
       await db.insert(productImages).values(values)
+    }
+  },
+
+  // ── SET ATTRIBUTES (Replace all) ───────────────────────────────────────────────────
+  setAttributes: async (
+    productId: string,
+    attrs: { label: string; textContent?: string | null; listItems?: string[] | null; sortOrder: number }[]
+  ) => {
+    await db.delete(productAttributes).where(eq(productAttributes.productId, productId))
+    if (attrs.length > 0) {
+      await db.insert(productAttributes).values(
+        attrs.map((a) => ({
+          productId,
+          label: a.label,
+          textContent: a.textContent ?? null,
+          listItems: a.listItems ?? null,
+          sortOrder: a.sortOrder,
+        }))
+      )
     }
   },
 
