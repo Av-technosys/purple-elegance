@@ -39,12 +39,6 @@ export const productService = {
     return product
   },
 
-  getBySlug: async (slug: string) => {
-    const product = await productRepository.findBySlug(slug)
-    if (!product) throw new Error("Product not found")
-    return product
-  },
-
   create: async (input: CreateProductInput) => {
     const parsed = createProductSchema.safeParse(input)
     if (!parsed.success) throw new Error(JSON.stringify(parsed.error.flatten().fieldErrors))

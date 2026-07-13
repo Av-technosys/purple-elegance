@@ -29,7 +29,7 @@ export const products: Product[] = [
     name: "Pink Floral Co-ord Set",
     slug: "pink-floral-co-ord-set",
     price: "₹1,099",
-    image: "/sample-product.png",
+    image: "/kurti-2.png",
     imagePosition: "object-[center_34%]",
   },
   {
@@ -43,14 +43,14 @@ export const products: Product[] = [
     name: "Beige Embroidered Suit",
     slug: "beige-embroidered-suit",
     price: "₹1,099",
-    image: "/sample-product.png",
+    image: "/kurti-2.png",
     imagePosition: "object-[center_50%]",
   },
   {
     name: "Red Embroidered Suit",
     slug: "red-embroidered-suit",
     price: "₹1,099",
-    image: "/sample-product.png",
+    image: "/kurti-1.png",
     imagePosition: "object-[center_18%]",
   },
   {
@@ -64,7 +64,7 @@ export const products: Product[] = [
     name: "Yellow Floral Anarkali",
     slug: "yellow-floral-anarkali-2",
     price: "₹1,099",
-    image: "/sample-product.png",
+    image: "/kurti-1.png",
     imagePosition: "object-[center_62%]",
   },
   {
@@ -78,14 +78,14 @@ export const products: Product[] = [
     name: "Pink Floral Co-ord Set",
     slug: "pink-floral-co-ord-set-2",
     price: "₹1,099",
-    image: "/sample-product.png",
+    image: "/kurti-2.png",
     imagePosition: "object-[center_38%]",
   },
   {
     name: "Beige Embroidered Suit",
     slug: "beige-embroidered-suit-3",
     price: "₹1,099",
-    image: "/sample-product.png",
+    image: "/kurti-1.png",
     imagePosition: "object-[center_50%]",
   },
   {
