@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState } from "react"
+import { ChevronDown } from "lucide-react"
 
 const faqSections = [
   {
@@ -228,13 +229,11 @@ export default function FaqPage() {
                       style={{ outline: "none", boxShadow: "none" }}
                     >
                       <span>{item.question}</span>
-                      <span
-                        className={`text-gray-500 font-normal transition-transform duration-200 transform text-xs pl-4 shrink-0 ${
+                      <ChevronDown
+                        className={`size-4.5 text-slate-800 transition-transform duration-200 shrink-0 ${
                           isOpen ? "rotate-180" : "rotate-0"
                         }`}
-                      >
-                        ▼
-                      </span>
+                      />
                     </button>
 
                     {/* RENDERING THE CONTENT AREA */}

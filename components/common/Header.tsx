@@ -27,8 +27,8 @@ const audienceTabs = ["Men", "Women", "Kids"];
 const menuItems = [
   { name: "Home", href: "/" },
   { name: "Shop", href: "/product" },
-  { name: "New Arrivals", href: "/product" },
-  { name: "Best Sellers", href: "/product" },
+  { name: "New Arrivals", href: "/#new-arrivals" },
+  { name: "Best Sellers", href: "/#best-sellers" },
   { name: "About Us", href: "/about" },
   { name: "Contact Us", href: "/contact" },
 ];
@@ -38,6 +38,31 @@ const Header = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [allowClose, setAllowClose] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [cartCount, setCartCount] = useState(0);
+  const [wishlistCount, setWishlistCount] = useState(0);
+
+  const updateCounts = () => {
+    try {
+      const cart = JSON.parse(localStorage.getItem("purple-elegance-cart") || "[]");
+      const totalQty = cart.reduce((sum: number, item: any) => sum + (item.quantity || 1), 0);
+      setCartCount(totalQty);
+
+      const wishlist = JSON.parse(localStorage.getItem("purple-elegance-wishlist") || "[]");
+      setWishlistCount(wishlist.length);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  useEffect(() => {
+    updateCounts();
+    window.addEventListener("storage", updateCounts);
+    const interval = setInterval(updateCounts, 1000);
+    return () => {
+      window.removeEventListener("storage", updateCounts);
+      clearInterval(interval);
+    };
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -164,11 +189,29 @@ const Header = () => {
               aria-label="Wishlist"
               className="flex size-7 items-center justify-center md:size-8 cursor-pointer text-[#140A05]"
             >
-              <IconHeart size={25} stroke={2} />
+              <div className="relative">
+                <IconHeart size={25} stroke={2} />
+                {wishlistCount > 0 && (
+                  <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#351300] text-[8px] font-bold text-white shadow-xs">
+                    {wishlistCount}
+                  </span>
+                )}
+              </div>
             </Link>
 
-            <Link href="/cart" aria-label="Shopping bag" className="flex size-7 items-center justify-center md:size-8">
-              <IconShoppingBag size={25} stroke={2} />
+            <Link 
+              href="/cart" 
+              aria-label="Shopping bag" 
+              className="flex size-7 items-center justify-center md:size-8 text-[#140A05]"
+            >
+              <div className="relative">
+                <IconShoppingBag size={25} stroke={2} />
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#B91C1C] text-[8px] font-bold text-white shadow-xs">
+                    {cartCount}
+                  </span>
+                )}
+              </div>
             </Link>
           </nav>
         </div>

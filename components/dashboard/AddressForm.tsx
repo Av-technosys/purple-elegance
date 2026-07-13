@@ -1,29 +1,89 @@
 "use client"
 
-import React from "react"
+import React, { useState } from "react"
 
 export function AddressForm() {
+  const [fullName, setFullName] = useState("")
+  const [phone, setPhone] = useState("")
+  const [addressLine1, setAddressLine1] = useState("")
+  const [addressLine2, setAddressLine2] = useState("")
+  const [city, setCity] = useState("")
+  const [state, setState] = useState("")
+  const [zip, setZip] = useState("")
+  const [country, setCountry] = useState("India")
+  const [isDefault, setIsDefault] = useState(false)
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!fullName || !phone || !addressLine1 || !city || !state || !zip) {
+      alert("Please fill in all required fields.")
+      return
+    }
+
+    const newAddress = {
+      id: String(Date.now()),
+      fullName,
+      phone,
+      addressLine1,
+      addressLine2,
+      city,
+      state,
+      zip,
+      country,
+      isDefault,
+    }
+
+    const savedAddresses = JSON.parse(localStorage.getItem("purple-elegance-addresses") || "[]")
+    let updatedAddresses = [...savedAddresses]
+
+    if (isDefault) {
+      updatedAddresses = updatedAddresses.map((addr: any) => ({
+        ...addr,
+        isDefault: false,
+      }))
+    }
+
+    if (updatedAddresses.length === 0) {
+      newAddress.isDefault = true
+    }
+
+    updatedAddresses.push(newAddress)
+    localStorage.setItem("purple-elegance-addresses", JSON.stringify(updatedAddresses))
+
+    window.location.href = "/dashboard/address"
+  }
+
+  const handleCancel = () => {
+    window.location.href = "/dashboard/address"
+  }
+
   return (
-    <form onSubmit={(e) => e.preventDefault()} className="w-full bg-white max-w-4xl mx-auto space-y-5 text-[#111111] antialiased font-sans">
+    <form onSubmit={handleSubmit} className="w-full bg-white max-w-4xl mx-auto space-y-5 text-[#111111] antialiased font-sans">
       
       {/* Full Name & Phone Number Input Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
         <div className="flex flex-col gap-2">
           <label className="text-[12px] font-bold text-gray-900 tracking-wide">
-            Full Name
+            Full Name *
           </label>
           <input
             type="text"
+            required
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
             placeholder="e.g. Julian Vane"
             className="w-full border border-gray-400 bg-white px-3 py-3 text-[13px] font-medium text-gray-900 rounded-[4px] placeholder-gray-400/80 outline-none transition-colors focus:border-gray-900"
           />
         </div>
         <div className="flex flex-col gap-2">
           <label className="text-[12px] font-bold text-gray-900 tracking-wide">
-            Phone Number
+            Phone Number *
           </label>
           <input
             type="tel"
+            required
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
             placeholder="+1 (555) 000-0000"
             className="w-full border border-gray-400 bg-white px-3 py-3 text-[13px] font-medium text-gray-900 rounded-[4px] placeholder-gray-400/80 outline-none transition-colors focus:border-gray-900"
           />
@@ -33,10 +93,13 @@ export function AddressForm() {
       {/* Address Line 1 */}
       <div className="flex flex-col gap-2">
         <label className="text-[12px] font-bold text-gray-900 tracking-wide">
-          Address Line 1
+          Address Line 1 *
         </label>
         <input
           type="text"
+          required
+          value={addressLine1}
+          onChange={(e) => setAddressLine1(e.target.value)}
           placeholder="Street address, P.O. box, company name"
           className="w-full border border-gray-400 bg-white px-3 py-3 text-[13px] font-medium text-gray-900 rounded-[4px] placeholder-gray-400/80 outline-none transition-colors focus:border-gray-900"
         />
@@ -49,6 +112,8 @@ export function AddressForm() {
         </label>
         <input
           type="text"
+          value={addressLine2}
+          onChange={(e) => setAddressLine2(e.target.value)}
           placeholder="Apartment, suite, unit, building, floor, etc."
           className="w-full border border-gray-400 bg-white px-3 py-3 text-[13px] font-medium text-gray-900 rounded-[4px] placeholder-gray-400/80 outline-none transition-colors focus:border-gray-900"
         />
@@ -58,30 +123,39 @@ export function AddressForm() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4">
         <div className="flex flex-col gap-2">
           <label className="text-[12px] font-bold text-gray-900 tracking-wide">
-            City
+            City *
           </label>
           <input
             type="text"
+            required
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
             placeholder="City"
             className="w-full border border-gray-400 bg-white px-3 py-3 text-[13px] font-medium text-gray-900 rounded-[4px] placeholder-gray-400/80 outline-none transition-colors focus:border-gray-900"
           />
         </div>
         <div className="flex flex-col gap-2">
           <label className="text-[12px] font-bold text-gray-900 tracking-wide">
-            State / Province
+            State / Province *
           </label>
           <input
             type="text"
+            required
+            value={state}
+            onChange={(e) => setState(e.target.value)}
             placeholder="State"
             className="w-full border border-gray-400 bg-white px-3 py-3 text-[13px] font-medium text-gray-900 rounded-[4px] placeholder-gray-400/80 outline-none transition-colors focus:border-gray-900"
           />
         </div>
         <div className="flex flex-col gap-2">
           <label className="text-[12px] font-bold text-gray-900 tracking-wide">
-            Zip / Postal Code
+            Zip / Postal Code *
           </label>
           <input
             type="text"
+            required
+            value={zip}
+            onChange={(e) => setZip(e.target.value)}
             placeholder="Zip Code"
             className="w-full border border-gray-400 bg-white px-3 py-3 text-[13px] font-medium text-gray-900 rounded-[4px] placeholder-gray-400/80 outline-none transition-colors focus:border-gray-900"
           />
@@ -94,11 +168,15 @@ export function AddressForm() {
           Country
         </label>
         <div className="relative w-full">
-          <select className="w-full border border-gray-400 bg-white px-3 py-3 text-[13px] font-medium text-gray-900 rounded-[4px] outline-none appearance-none transition-colors focus:border-gray-900">
+          <select 
+            value={country}
+            onChange={(e) => setCountry(e.target.value)}
+            className="w-full border border-gray-400 bg-white px-3 py-3 text-[13px] font-medium text-gray-900 rounded-[4px] outline-none appearance-none transition-colors focus:border-gray-900 cursor-pointer"
+          >
+            <option>India</option>
             <option>United States</option>
             <option>Canada</option>
             <option>United Kingdom</option>
-            <option>India</option>
           </select>
           <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
             <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -113,6 +191,8 @@ export function AddressForm() {
         <label className="inline-flex items-center gap-3 cursor-pointer select-none group">
           <input 
             type="checkbox" 
+            checked={isDefault}
+            onChange={(e) => setIsDefault(e.target.checked)}
             className="h-4 w-4 rounded border-gray-300 text-black focus:ring-0 focus:ring-offset-0 accent-black cursor-pointer" 
           />
           <span className="text-[12px] font-medium text-gray-600 group-hover:text-gray-900 transition-colors">
@@ -125,13 +205,14 @@ export function AddressForm() {
       <div className="pt-4 flex flex-row items-center gap-4">
         <button
           type="submit"
-          className="bg-black hover:bg-zinc-900 text-white text-[13px] font-bold py-3 px-8 rounded-[4px] transition-colors duration-150"
+          className="bg-black hover:bg-zinc-900 text-white text-[13px] font-bold py-3 px-8 rounded-[4px] transition-colors duration-150 cursor-pointer"
         >
           Save Address
         </button>
         <button
           type="button"
-          className="border border-[#4c4454]/60 bg-white hover:bg-zinc-50 text-black text-[13px] font-bold py-3 px-10 rounded-[4px] transition-colors duration-150"
+          onClick={handleCancel}
+          className="border border-[#4c4454]/60 bg-white hover:bg-zinc-50 text-black text-[13px] font-bold py-3 px-10 rounded-[4px] transition-colors duration-150 cursor-pointer"
         >
           Cancel
         </button>

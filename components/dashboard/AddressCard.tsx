@@ -10,6 +10,7 @@ interface AddressCardProps {
   phone: string
   isDefault?: boolean
   typeLabel?: string
+  onSetDefault?: () => void
 }
 
 export function AddressCard({
@@ -22,6 +23,7 @@ export function AddressCard({
   phone,
   isDefault,
   typeLabel,
+  onSetDefault,
 }: AddressCardProps) {
   return (
     <div className="rounded-[10px] border border-zinc-200 bg-white p-6 shadow-sm">
@@ -39,9 +41,13 @@ export function AddressCard({
             Default Address
           </span>
         ) : (
-          <Link href="/dashboard/address" className="text-xs font-semibold text-[#2A0C00] underline">
+          <button
+            type="button"
+            onClick={onSetDefault}
+            className="text-xs font-semibold text-[#2A0C00] underline cursor-pointer hover:text-[#4A2313] bg-transparent border-none outline-none"
+          >
             Set as default
-          </Link>
+          </button>
         )}
       </div>
 

@@ -7,60 +7,48 @@ import { OrderSummary } from "@/components/cart/OrderSummary"
 import { ProductList } from "@/components/cart/ProductList"
 import type { CartItemType } from "@/components/cart/CartItem"
 
-const initialItems: CartItemType[] = [
-  {
-    id: "red-embroidered-suit",
-    title: "Red Embroidered Suit",
-    subtitle: "Ethnic Suit",
-    size: "32",
-    colorLabel: "Red",
-    colorCode: "#B91C1C",
-    price: 1999,
-    originalPrice: 2499,
-    discountLabel: "(20% OFF)",
-    quantity: 1,
-    image:
-      "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=600&q=80",
-  },
-  {
-    id: "beige-embroidered-suit",
-    title: "Beige Embroidered Suit",
-    subtitle: "Ethnic Suit",
-    size: "32",
-    colorLabel: "Beige",
-    colorCode: "#D9B99B",
-    price: 1999,
-    originalPrice: 2499,
-    discountLabel: "(20% OFF)",
-    quantity: 1,
-    image:
-      "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=600&q=80",
-  },
-]
+import { useEffect } from "react"
 
 const Page = () => {
-  const [items, setItems] = useState<CartItemType[]>(initialItems)
+  const [items, setItems] = useState<CartItemType[]>([])
+
+  // Load cart from localStorage on mount
+  useEffect(() => {
+    const savedCart = localStorage.getItem("purple-elegance-cart")
+    if (savedCart) {
+      try {
+        setItems(JSON.parse(savedCart))
+      } catch (e) {
+        console.error("Error parsing cart", e)
+      }
+    }
+  }, [])
+
+  // Save cart to localStorage whenever items change
+  const updateItems = (newItems: CartItemType[]) => {
+    setItems(newItems)
+    localStorage.setItem("purple-elegance-cart", JSON.stringify(newItems))
+  }
 
   const handleIncrease = (id: string) => {
-    setItems((current) =>
-      current.map((item) =>
-        item.id === id ? { ...item, quantity: item.quantity + 1 } : item
-      )
+    const updated = items.map((item) =>
+      item.id === id ? { ...item, quantity: item.quantity + 1 } : item
     )
+    updateItems(updated)
   }
 
   const handleDecrease = (id: string) => {
-    setItems((current) =>
-      current.map((item) =>
-        item.id === id
-          ? { ...item, quantity: Math.max(item.quantity - 1, 1) }
-          : item
-      )
+    const updated = items.map((item) =>
+      item.id === id
+        ? { ...item, quantity: Math.max(item.quantity - 1, 1) }
+        : item
     )
+    updateItems(updated)
   }
 
   const handleRemove = (id: string) => {
-    setItems((current) => current.filter((item) => item.id !== id))
+    const updated = items.filter((item) => item.id !== id)
+    updateItems(updated)
   }
 
   const handleApplyCoupon = () => {
