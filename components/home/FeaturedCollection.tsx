@@ -12,18 +12,21 @@ import Link from "next/link";
 const collections = [
   {
     title: "Festive Collection",
+    categoryKey: "Festive Collection",
     description: "Celebrate in style with prints that speak elegance",
     image: "/sample-product.png",
     position: "object-[center_34%]",
   },
   {
     title: "Co-ord Sets",
+    categoryKey: "Kurta Sets",
     description: "Celebrate in style with prints that speak elegance",
     image: "/sample-product.png",
     position: "object-[center_18%]",
   },
   {
     title: "Floral Anarkali",
+    categoryKey: "Anarkali Suits",
     description: "Celebrate in style with prints that speak elegance",
     image: "/sample-product.png",
     position: "object-[center_28%]",
@@ -31,12 +34,14 @@ const collections = [
   },
   {
     title: "Embroidered Suit",
+    categoryKey: "Ethnic Wear",
     description: "Celebrate in style with prints that speak elegance",
     image: "/sample-product.png",
     position: "object-[center_42%]",
   },
   {
     title: "Everyday Elegance",
+    categoryKey: "Kurtis",
     description: "Celebrate in style with prints that speak elegance",
     image: "/sample-product.png",
     position: "object-[center_55%]",
@@ -192,7 +197,7 @@ export default function FeaturedCollection() {
 
                     {isActive ? (
                       <Link
-                        href="/product"
+                        href={`/product?category=${encodeURIComponent(collection.categoryKey)}`}
                         className="mt-7 inline-flex h-[42px] items-center gap-2 rounded-[4px] bg-[#fff2df] px-7 text-[10px] font-semibold tracking-wider text-[#2A0C00] transition-colors hover:bg-white"
                       >
                         EXPLORE COLLECTION

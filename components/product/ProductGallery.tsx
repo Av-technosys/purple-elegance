@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import Image from "next/image";
 import { IconZoomIn } from "@tabler/icons-react";
 
@@ -8,37 +11,44 @@ export default function ProductGallery({
 }: {
   product: ProductDetail;
 }) {
-  const [primaryImage, ...thumbnailImages] = product.images;
-  const thumbnails = [primaryImage, ...thumbnailImages];
+  const thumbnails = product.images;
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const activeImage = thumbnails[activeImageIndex] || thumbnails[0];
 
   return (
-    <div className="md:flex md:gap-5">
+    <div className="md:flex md:gap-5 select-none">
       <div className="hidden w-[124px] shrink-0 flex-col gap-4 md:flex">
-        {thumbnails.map((image, index) => (
-          <button
-            key={`${image.alt}-${index}`}
-            type="button"
-            className="relative aspect-[124/154] overflow-hidden bg-[#E5C7A6]"
-            aria-label={`View ${image.alt}`}
-          >
-            <Image
-              src={image.src}
-              alt={image.alt}
-              fill
-              className={`object-cover ${image.position}`}
-              sizes="124px"
-            />
-          </button>
-        ))}
+        {thumbnails.map((image, index) => {
+          const isSelected = activeImageIndex === index;
+          return (
+            <button
+              key={`${image.alt}-${index}`}
+              type="button"
+              onClick={() => setActiveImageIndex(index)}
+              className={`relative aspect-[124/154] overflow-hidden bg-[#E5C7A6] cursor-pointer transition-all border ${
+                isSelected ? "border-[#2A0C00] ring-2 ring-[#C18A48] scale-102" : "border-transparent"
+              }`}
+              aria-label={`View ${image.alt}`}
+            >
+              <Image
+                src={image.src}
+                alt={image.alt}
+                fill
+                className={`object-cover ${image.position}`}
+                sizes="124px"
+              />
+            </button>
+          );
+        })}
       </div>
 
       <div className="relative aspect-[344/430] overflow-hidden bg-[#E5C7A6] md:h-[680px] md:w-[430px] md:aspect-auto">
         <Image
-          src={primaryImage.src}
-          alt={primaryImage.alt}
+          src={activeImage.src}
+          alt={activeImage.alt}
           fill
           priority
-          className={`object-cover ${primaryImage.position}`}
+          className={`object-cover ${activeImage.position}`}
           sizes="(max-width: 768px) 100vw, 430px"
         />
         <button
@@ -51,22 +61,28 @@ export default function ProductGallery({
       </div>
 
       <div className="mt-2 grid grid-cols-4 gap-2 md:hidden">
-        {thumbnails.map((image, index) => (
-          <button
-            key={`${image.alt}-mobile-${index}`}
-            type="button"
-            className="relative aspect-square overflow-hidden bg-[#E5C7A6]"
-            aria-label={`View ${image.alt}`}
-          >
-            <Image
-              src={image.src}
-              alt={image.alt}
-              fill
-              className={`object-cover ${image.position}`}
-              sizes="25vw"
-            />
-          </button>
-        ))}
+        {thumbnails.map((image, index) => {
+          const isSelected = activeImageIndex === index;
+          return (
+            <button
+              key={`${image.alt}-mobile-${index}`}
+              type="button"
+              onClick={() => setActiveImageIndex(index)}
+              className={`relative aspect-square overflow-hidden bg-[#E5C7A6] cursor-pointer border ${
+                isSelected ? "border-[#2A0C00] scale-102" : "border-transparent"
+              }`}
+              aria-label={`View ${image.alt}`}
+            >
+              <Image
+                src={image.src}
+                alt={image.alt}
+                fill
+                className={`object-cover ${image.position}`}
+                sizes="25vw"
+              />
+            </button>
+          );
+        })}
       </div>
     </div>
   );
