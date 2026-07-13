@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Eye } from "lucide-react";
 import { Select } from "@/components/select";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -57,33 +58,37 @@ export default function OrderTable({ page, orders, pageSize }: OrderTableProps) 
   const pathname = usePathname();
 
   return (
-    <div className="mt-4">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>S.No</TableHead>
-            <TableHead>Order #</TableHead>
-            <TableHead>Customer</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Payment</TableHead>
-            <TableHead>Total</TableHead>
-            <TableHead>Address</TableHead>
-            <TableHead className="text-end">Action</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {orderRows.length ? (
-            orderRows.map((order, index) => (
-              <TableRow key={order.id} className={isPending ? "opacity-60" : ""}>
-                <TableCell>{startIndex + index + 1}</TableCell>
-                <TableCell className="font-mono text-xs">{order.orderNumber}</TableCell>
-                <TableCell>
-                  {order.userFirstName || order.userLastName
-                    ? `${order.userFirstName ?? ""} ${order.userLastName ?? ""}`.trim()
-                    : order.userEmail ?? "—"}
+    <Table>
+      <TableHeader className="bg-slate-50/75 border-b border-slate-100">
+        <TableRow>
+          <TableHead className="px-4 py-2.5 font-semibold text-slate-700 text-xs uppercase tracking-wider">S.No</TableHead>
+          <TableHead className="px-4 py-2.5 font-semibold text-slate-700 text-xs uppercase tracking-wider">Order #</TableHead>
+          <TableHead className="px-4 py-2.5 font-semibold text-slate-700 text-xs uppercase tracking-wider">Customer</TableHead>
+          <TableHead className="px-4 py-2.5 font-semibold text-slate-700 text-xs uppercase tracking-wider">Status</TableHead>
+          <TableHead className="px-4 py-2.5 font-semibold text-slate-700 text-xs uppercase tracking-wider">Payment</TableHead>
+          <TableHead className="px-4 py-2.5 font-semibold text-slate-700 text-xs uppercase tracking-wider">Total</TableHead>
+          <TableHead className="px-4 py-2.5 font-semibold text-slate-700 text-xs uppercase tracking-wider">Address</TableHead>
+          <TableHead className="px-4 py-2.5 font-semibold text-slate-700 text-xs uppercase tracking-wider text-right">Action</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {orderRows.length ? (
+          orderRows.map((order, index) => {
+            const pStatus = order.paymentStatus.toLowerCase();
+            return (
+              <TableRow key={order.id} className={`hover:bg-slate-50/50 transition-colors border-b border-slate-100 last:border-none ${isPending ? "opacity-60" : ""}`}>
+                <TableCell className="px-4 py-2.5 text-slate-500 font-medium">{startIndex + index + 1}</TableCell>
+                <TableCell className="px-4 py-2.5 font-mono text-xs font-semibold text-slate-800">{order.orderNumber}</TableCell>
+                <TableCell className="px-4 py-2.5">
+                  <div className="font-semibold text-slate-800 text-sm">
+                    {order.userFirstName || order.userLastName
+                      ? `${order.userFirstName ?? ""} ${order.userLastName ?? ""}`.trim()
+                      : "—"}
+                  </div>
+                  <div className="text-xs text-slate-400 font-medium mt-0.5">{order.userEmail ?? ""}</div>
                 </TableCell>
-                <TableCell>
-                  <div className="min-w-36">
+                <TableCell className="px-4 py-2.5">
+                  <div className="min-w-[9.5rem] max-w-[10rem]">
                     <Select
                       placeholder="Status"
                       label=""
@@ -105,33 +110,49 @@ export default function OrderTable({ page, orders, pageSize }: OrderTableProps) 
                     />
                   </div>
                 </TableCell>
-                <TableCell className="capitalize">{order.paymentStatus}</TableCell>
-                <TableCell>{formatCurrency(order.total)}</TableCell>
-                <TableCell className="max-w-40 truncate">
+                <TableCell className="px-4 py-2.5">
+                  <span
+                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold border ${
+                      pStatus === "paid"
+                        ? "bg-emerald-50 text-emerald-700 border-emerald-100"
+                        : pStatus === "failed"
+                          ? "bg-red-50 text-red-700 border-red-100"
+                          : pStatus === "refunded"
+                            ? "bg-orange-50 text-orange-700 border-orange-100"
+                            : "bg-amber-50 text-amber-700 border-amber-100"
+                    }`}
+                  >
+                    {order.paymentStatus}
+                  </span>
+                </TableCell>
+                <TableCell className="px-4 py-2.5 font-bold text-slate-900">
+                  {formatCurrency(order.total)}
+                </TableCell>
+                <TableCell className="px-4 py-2.5 max-w-[12rem] truncate text-slate-600 text-sm">
                   {order.addressLine1 ?? "—"}
                   {order.addressLine2 ? `, ${order.addressLine2}` : ""}
                 </TableCell>
-                <TableCell className="text-right">
-                  <button
-                    type="button"
+                <TableCell className="px-4 py-2.5 text-right">
+                  <Button
+                    variant="outline"
                     onClick={() => router.push(`${pathname}/${order.id}`)}
-                    className="inline-flex items-center justify-center rounded-md p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
-                    aria-label="View details"
+                    className="size-8 p-0 rounded-lg border-slate-200 text-slate-500 hover:text-violet-600 hover:bg-violet-50 hover:border-violet-200 transition-all flex items-center justify-center shrink-0"
+                    title="View details"
                   >
-                    <Eye className="size-4" />
-                  </button>
+                    <Eye className="size-3.5" />
+                  </Button>
                 </TableCell>
               </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={8} className="h-24 text-center text-gray-600">
-                No orders found.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-    </div>
+            );
+          })
+        ) : (
+          <TableRow>
+            <TableCell colSpan={8} className="h-32 text-center text-slate-400 font-medium">
+              No orders found matching filters.
+            </TableCell>
+          </TableRow>
+        )}
+      </TableBody>
+    </Table>
   );
 }

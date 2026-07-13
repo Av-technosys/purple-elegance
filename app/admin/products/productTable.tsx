@@ -69,85 +69,112 @@ export default function ProductTable({ products }: { products: ProductRow[] }) {
 
   return (
     <Table>
-      <TableHeader>
+      <TableHeader className="bg-slate-50/75 border-b border-slate-100">
         <TableRow>
-          <TableHead>Product</TableHead>
-          <TableHead>SKU</TableHead>
-          <TableHead>Price</TableHead>
-          <TableHead>Compare Price</TableHead>
-          <TableHead>Stock</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Featured</TableHead>
-          <TableHead className="text-right">Actions</TableHead>
+          <TableHead className="px-4 py-2.5 font-semibold text-slate-700 text-xs uppercase tracking-wider">Product</TableHead>
+          <TableHead className="px-4 py-2.5 font-semibold text-slate-700 text-xs uppercase tracking-wider">SKU</TableHead>
+          <TableHead className="px-4 py-2.5 font-semibold text-slate-700 text-xs uppercase tracking-wider">Price</TableHead>
+          <TableHead className="px-4 py-2.5 font-semibold text-slate-700 text-xs uppercase tracking-wider">Compare Price</TableHead>
+          <TableHead className="px-4 py-2.5 font-semibold text-slate-700 text-xs uppercase tracking-wider">Stock</TableHead>
+          <TableHead className="px-4 py-2.5 font-semibold text-slate-700 text-xs uppercase tracking-wider">Status</TableHead>
+          <TableHead className="px-4 py-2.5 font-semibold text-slate-700 text-xs uppercase tracking-wider">Featured</TableHead>
+          <TableHead className="px-4 py-2.5 font-semibold text-slate-700 text-xs uppercase tracking-wider text-right">Actions</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {products.length ? (
           products.map((product) => (
-            <TableRow key={product.id}>
-              <TableCell>
+            <TableRow key={product.id} className="hover:bg-slate-50/50 transition-colors border-b border-slate-100 last:border-none">
+              <TableCell className="px-4 py-2.5">
                 <div className="flex items-center gap-3">
-                  <div className="relative size-12 shrink-0 overflow-hidden rounded-md border bg-muted">
+                  <div className="relative size-9 shrink-0 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-xs">
                     {product.image ? (
                       <Image
                         src={product.image}
                         alt={product.name}
                         fill
-                        sizes="48px"
+                        sizes="36px"
                         className="object-cover"
                       />
-                    ) : null}
+                    ) : (
+                      <div className="size-full bg-slate-50 flex items-center justify-center text-[10px] text-slate-400 font-bold uppercase">
+                        {product.name.slice(0, 2)}
+                      </div>
+                    )}
                   </div>
-                  <span className="font-medium">{product.name}</span>
+                  <span className="font-semibold text-slate-800 text-sm hover:text-violet-600 transition-colors cursor-pointer" onClick={() => router.push(`/admin/products/${product.id}`)}>
+                    {product.name}
+                  </span>
                 </div>
               </TableCell>
-              <TableCell className="font-mono text-xs">
+              <TableCell className="px-4 py-2.5 font-mono text-xs text-slate-500">
                 {product.sku ?? "—"}
               </TableCell>
-              <TableCell>{formatPrice(product.price)}</TableCell>
-              <TableCell>{formatPrice(product.comparePrice)}</TableCell>
-              <TableCell>{product.stock}</TableCell>
-              <TableCell>
+              <TableCell className="px-4 py-2.5 font-semibold text-slate-800">
+                {formatPrice(product.price)}
+              </TableCell>
+              <TableCell className="px-4 py-2.5 text-slate-400 line-through text-xs">
+                {formatPrice(product.comparePrice)}
+              </TableCell>
+              <TableCell className="px-4 py-2.5 text-slate-600 font-medium">
+                {product.stock}
+              </TableCell>
+              <TableCell className="px-4 py-2.5">
                 <span
-                  className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
+                  className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold border ${
                     product.isActive
-                      ? "bg-emerald-100 text-emerald-700"
-                      : "bg-slate-100 text-slate-600"
+                      ? "bg-emerald-50 text-emerald-700 border-emerald-100"
+                      : "bg-slate-50 text-slate-500 border-slate-200"
                   }`}
                 >
                   {product.isActive ? "Active" : "Inactive"}
                 </span>
               </TableCell>
-              <TableCell>{product.isFeatured ? "Yes" : "No"}</TableCell>
-              <TableCell>
+              <TableCell className="px-4 py-2.5">
+                {product.isFeatured ? (
+                  <span className="inline-flex items-center rounded-full bg-violet-50 text-violet-700 border border-violet-100 px-2.5 py-0.5 text-xs font-semibold">
+                    Featured
+                  </span>
+                ) : (
+                  <span className="text-slate-400 text-xs">No</span>
+                )}
+              </TableCell>
+              <TableCell className="px-4 py-2.5 text-right">
                 <div className="flex justify-end gap-2">
                   <Button
                     variant="outline"
                     onClick={() => router.push(`/admin/products/${product.id}`)}
+                    className="size-8 p-0 rounded-lg border-slate-200 text-slate-500 hover:text-violet-600 hover:bg-violet-50 hover:border-violet-200 transition-all flex items-center justify-center shrink-0"
+                    title="Edit Product"
                   >
-                    <Edit />
+                    <Edit className="size-3.5" />
                   </Button>
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
-                      <Button variant="outline" disabled={isPending}>
-                        <Trash2 className="text-red-500" />
+                      <Button 
+                        variant="outline" 
+                        disabled={isPending}
+                        className="size-8 p-0 rounded-lg border-slate-200 text-slate-500 hover:text-red-600 hover:bg-red-50 hover:border-red-200 transition-all flex items-center justify-center shrink-0"
+                        title="Delete Product"
+                      >
+                        <Trash2 className="size-3.5" />
                       </Button>
                     </AlertDialogTrigger>
-                    <AlertDialogContent>
+                    <AlertDialogContent className="rounded-xl">
                       <AlertDialogHeader>
-                        <AlertDialogTitle>Delete product permanently?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          This removes the product and its images from the database.
+                        <AlertDialogTitle className="text-base font-bold text-slate-900">Delete product permanently?</AlertDialogTitle>
+                        <AlertDialogDescription className="text-sm text-slate-500 mt-1">
+                          This removes the product and its images from the database. This action cannot be undone.
                         </AlertDialogDescription>
                       </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
+                      <AlertDialogFooter className="mt-4">
+                        <AlertDialogCancel disabled={isPending} className="rounded-lg">Cancel</AlertDialogCancel>
                         <AlertDialogAction
                           disabled={isPending}
                           onClick={() => handleDelete(product.id)}
-                          className="bg-red-600 hover:bg-red-700"
+                          className="bg-red-600 hover:bg-red-700 text-white rounded-lg px-4"
                         >
-                          {isPending ? <Loader2 className="animate-spin" /> : "Delete"}
+                          {isPending ? <Loader2 className="size-4 animate-spin text-white" /> : "Delete"}
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
@@ -158,8 +185,8 @@ export default function ProductTable({ products }: { products: ProductRow[] }) {
           ))
         ) : (
           <TableRow>
-            <TableCell colSpan={8} className="h-24 text-center text-gray-600">
-              No products found.
+            <TableCell colSpan={8} className="h-32 text-center text-slate-400 font-medium">
+              No products found matching filters.
             </TableCell>
           </TableRow>
         )}
