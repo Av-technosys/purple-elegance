@@ -39,18 +39,16 @@ export default function HeaderAccount({
   }
 
   return (
-    <div className="grid grid-cols-2 gap-0">
-     
-      <Button asChild className="h-[35px] rounded-none bg-[#351300] text-[12px] font-semibold text-white hover:bg-[#4A1B04]">
+    <div className="grid grid-cols-2 gap-3">
+      <Button asChild className="h-[36px] rounded-[3px] bg-[#351300] text-[12px] font-semibold text-white hover:bg-[#4A1B04] cursor-pointer">
         <Link href={"/login"}> Login</Link>
       </Button>
-  
       <Button
         asChild
         variant="outline"
-        className="h-[35px] rounded-none border-[#351300] bg-white text-[12px] font-semibold text-[#140A05] hover:bg-[#F8EAD8]"
+        className="h-[36px] rounded-[3px] border-[#351300] bg-white text-[12px] font-semibold text-[#140A05] hover:bg-[#F8EAD8] cursor-pointer"
       >
-       <Link href={"/register"}>  Sign Up</Link>
+        <Link href={"/register"}>  Sign Up</Link>
       </Button>
     </div>
   );

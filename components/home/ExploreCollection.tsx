@@ -13,8 +13,9 @@ import {
   IconChevronLeft,
   IconChevronRight,
 } from "@tabler/icons-react"
+import { useGenderTheme } from "@/helper/useGenderTheme"
 
-const collections = [
+const collectionsData = [
   {
     title: "WEDDING EDIT",
     image: "/collection-1.png",
@@ -68,6 +69,8 @@ const benefits = [
 export default function ExploreCollection() {
   const [activeIndex, setActiveIndex] = useState(0)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const theme = useGenderTheme()
+  const collections = theme.exploreCollections
 
   const handleScroll = (index: number) => {
     if (index < 0 || index >= benefits.length) return

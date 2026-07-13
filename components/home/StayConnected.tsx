@@ -10,6 +10,7 @@ import {
 import { motion } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
+import { useGenderTheme } from "@/helper/useGenderTheme";
 
 const socialLinks = [
   {
@@ -31,11 +32,13 @@ const socialLinks = [
 ];
 
 export default function StayConnected() {
+  const theme = useGenderTheme()
+
   return (
     <section className="relative min-h-[780px] sm:min-h-[340px] lg:min-h-[360px] overflow-hidden bg-[#f7eadb] px-5 py-12 text-center text-[#2A0C00] sm:py-12">
       <div className="block sm:hidden absolute inset-0">
         <Image
-          src="/stayconnected-mobile.png"
+          src={theme.gender === "women" ? "/stayconnected-mobile.png" : theme.stayConnectedBg}
           alt=""
           fill
           className="object-cover object-center"
@@ -46,7 +49,7 @@ export default function StayConnected() {
 
       <div className="hidden sm:block absolute inset-0">
         <Image
-          src="/stay-connected.png"
+          src={theme.stayConnectedBg}
           alt=""
           fill
           className="object-cover object-center"
