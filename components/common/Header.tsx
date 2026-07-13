@@ -66,30 +66,7 @@ const Header = () => {
     };
   }, []);
 
-  const updateCounts = () => {
-    try {
-      const cart = JSON.parse(localStorage.getItem("purple-elegance-cart") || "[]");
-      const totalQty = cart.reduce((sum: number, item: any) => sum + (item.quantity || 1), 0);
-      setCartCount(totalQty);
 
-      const wishlist = JSON.parse(localStorage.getItem("purple-elegance-wishlist") || "[]");
-      setWishlistCount(wishlist.length);
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
-  useEffect(() => {
-    updateCounts();
-    window.addEventListener("storage", updateCounts);
-    const interval = setInterval(updateCounts, 1000);
-    return () => {
-      window.removeEventListener("storage", updateCounts);
-      clearInterval(interval);
-    };
-  }, []);
-
-  
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 10) {

@@ -2,6 +2,7 @@
 
 import { FormEvent, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { toast } from "sonner";
 import { Plus, Trash2, X, UploadCloud } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -377,11 +378,12 @@ export default function ProductForm({ product }: ProductFormProps) {
               {primaryImage ? (
                 <div className="flex flex-col sm:flex-row items-center gap-4 p-4 rounded-xl border border-slate-100 bg-slate-50/30">
                   <div className="relative size-24 shrink-0 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-xs">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
+                    <Image
                       src={primaryImage}
                       alt="Primary product cover"
-                      className="size-full object-cover"
+                      fill
+                      unoptimized
+                      className="object-cover"
                     />
                     <button
                       type="button"
@@ -438,11 +440,12 @@ export default function ProductForm({ product }: ProductFormProps) {
                 <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-4">
                   {mediaImages.map((mediaUrl, idx) => (
                     <div key={idx} className="group relative aspect-square overflow-hidden rounded-xl border border-slate-200 bg-slate-50 shadow-xs transition hover:shadow-sm">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
+                      <Image
                         src={mediaUrl}
                         alt={`Media ${idx + 1}`}
-                        className="size-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        fill
+                        unoptimized
+                        className="object-cover transition-transform duration-300 group-hover:scale-105"
                       />
                       <button
                         type="button"

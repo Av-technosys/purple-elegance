@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
-
+import Image from "next/image";
 import { Check, Eye, Images, Star, X } from "lucide-react";
 
 // Stub — reviews module not yet in schema
@@ -255,12 +255,15 @@ function ReviewRow({
                       className="aspect-video w-full bg-black object-contain"
                     />
                   ) : (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={item.url}
-                      alt={`Review media ${index + 1}`}
-                      className="aspect-video w-full object-contain"
-                    />
+                    <div className="relative aspect-video w-full">
+                      <Image
+                        src={item.url}
+                        alt={`Review media ${index + 1}`}
+                        fill
+                        unoptimized
+                        className="object-contain"
+                      />
+                    </div>
                   )}
                 </div>
               ))}

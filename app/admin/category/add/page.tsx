@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -178,11 +179,12 @@ export default function AddCategoryForm() {
                 <Field label="Image Banner">
                   {bannerPreview ? (
                     <div className="relative h-48 w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-50 shadow-xs group">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img 
+                      <Image 
                         src={bannerPreview} 
                         alt="Category preview" 
-                        className="size-full object-cover transition-transform duration-300 group-hover:scale-102" 
+                        fill
+                        unoptimized
+                        className="object-cover transition-transform duration-300 group-hover:scale-102" 
                       />
                       <div className="absolute inset-0 bg-black/45 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                         <button
