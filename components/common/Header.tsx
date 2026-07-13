@@ -66,7 +66,7 @@ const Header = () => {
     };
   }, []);
 
-  
+
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 10) {

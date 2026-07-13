@@ -2,6 +2,7 @@
 "use client";
 
 import { FormEvent, useEffect, useRef, useState, useTransition } from "react";
+import Image from "next/image";
 import {
   Card,
   CardContent,
@@ -192,11 +193,12 @@ export default function EditCategory({ categoryInfo }: any) {
                 <Field label="Image Banner">
                   {preview ? (
                     <div className="relative h-48 w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-50 shadow-xs group">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img 
+                      <Image 
                         src={preview} 
                         alt="Category preview" 
-                        className="size-full object-cover transition-transform duration-300 group-hover:scale-102" 
+                        fill
+                        unoptimized
+                        className="object-cover transition-transform duration-300 group-hover:scale-102" 
                       />
                       <div className="absolute inset-0 bg-black/45 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                         <button

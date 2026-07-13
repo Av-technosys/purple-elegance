@@ -112,6 +112,17 @@ export const productRepository = {
     })
   },
 
+  // ── FIND BY SLUG (with images and variants) ─────────────────────────────────
+  findBySlug: async (slug: string) => {
+    return db.query.products.findFirst({
+      where: eq(products.slug, slug),
+      with: {
+        images: true,
+        variants: true,
+      },
+    })
+  },
+
   // ── CREATE ──────────────────────────────────────────────────────────────────
   create: async (data: NewProduct) => {
     const [product] = await db.insert(products).values(data).returning()

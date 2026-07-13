@@ -24,6 +24,15 @@ export async function getFullProduct(id: string) {
   }
 }
 
+// ── GET BY SLUG ──────────────────────────────────────────────────────────────
+export async function getProductBySlug(slug: string) {
+  try {
+    return await productService.getBySlug(slug)
+  } catch {
+    return null
+  }
+}
+
 // ── CREATE ───────────────────────────────────────────────────────────────────
 export async function createProduct(input: CreateProductInput) {
   try {
