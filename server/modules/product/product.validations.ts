@@ -1,5 +1,12 @@
 import { z } from "zod"
 
+const attributeSchema = z.object({
+  label: z.string().min(1, "Label is required"),
+  textContent: z.string().optional().nullable(),
+  listItems: z.array(z.string()).optional().nullable(),
+  sortOrder: z.number().int().default(0),
+})
+
 export const createProductSchema = z.object({
   name: z.string().min(1, "Name is required").max(200),
   slug: z
@@ -19,6 +26,7 @@ export const createProductSchema = z.object({
       "Must be a valid price",
     ),
   categoryId: z.string().optional().nullable(),
+  gender: z.enum(["men", "women", "kids"]).optional().nullable(),
   stock: z.number().int().min(0).default(0),
   sku: z.string().max(100).optional().nullable(),
   tags: z.array(z.string()).optional(),
@@ -28,9 +36,12 @@ export const createProductSchema = z.object({
   isActive: z.boolean().default(true),
   // Array of image URLs
   images: z.array(z.string()).optional().default([]),
+  // Product attributes (PDP sections)
+  attributes: z.array(attributeSchema).optional().default([]),
 })
 
 export const updateProductSchema = createProductSchema.partial()
 
 export type CreateProductInput = z.infer<typeof createProductSchema>
 export type UpdateProductInput = z.infer<typeof updateProductSchema>
+export type AttributeInput = z.infer<typeof attributeSchema>

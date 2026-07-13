@@ -15,6 +15,13 @@
       "when": 1783334785197,
       "tag": "0001_bored_spacker_dave",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1783936685348,
+      "tag": "0002_pretty_umar",
+      "breakpoints": true
     }
   ]
 }

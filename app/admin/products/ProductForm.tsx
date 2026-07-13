@@ -16,6 +16,13 @@ import { cn } from "@/lib/utils";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
+type AttributeRow = {
+  label: string;
+  textContent: string;
+  listInput: string;      // raw textarea input (newline-separated)
+  listItems: string[];    // parsed array
+};
+
 type ProductFormProps = {
   product?: {
     id?: string;
@@ -32,7 +39,15 @@ type ProductFormProps = {
     isNewArrival?: boolean;
     isActive?: boolean;
     categoryId?: string | null;
+    gender?: "men" | "women" | "kids" | null;
     images?: { url: string; isPrimary: boolean }[];
+    attributes?: {
+      id: string;
+      label: string;
+      textContent?: string | null;
+      listItems?: string[] | null;
+      sortOrder: number;
+    }[];
   };
 };
 
@@ -69,11 +84,46 @@ export default function ProductForm({ product }: ProductFormProps) {
   const [isBestSeller, setIsBestSeller] = useState(Boolean(product?.isBestSeller));
   const [isNewArrival, setIsNewArrival] = useState(Boolean(product?.isNewArrival));
   const [isActive, setIsActive] = useState(product?.isActive ?? true);
+  const [gender, setGender] = useState<"men" | "women" | "kids" | "">(product?.gender ?? "");
   // Initialize with existing image URLs
   // Initialize with existing image URLs (first is primary, rest are media)
   const initialImages = product?.images?.map((i) => i.url) ?? [];
   const [primaryImage, setPrimaryImage] = useState<string>(initialImages[0] ?? "");
   const [mediaImages, setMediaImages] = useState<string[]>(initialImages.slice(1));
+
+  // ── Attributes state ─────────────────────────────────────────────────────
+  const [attributes, setAttributes] = useState<AttributeRow[]>(
+    (product?.attributes ?? []).map((a) => ({
+      label: a.label,
+      textContent: a.textContent ?? "",
+      listInput: (a.listItems ?? []).join("\n"),
+      listItems: a.listItems ?? [],
+    }))
+  );
+
+  function addAttribute() {
+    setAttributes((prev) => [...prev, { label: "", textContent: "", listInput: "", listItems: [] }]);
+  }
+
+  function removeAttribute(index: number) {
+    setAttributes((prev) => prev.filter((_, i) => i !== index));
+  }
+
+  function updateAttribute(index: number, field: keyof AttributeRow, value: string) {
+    setAttributes((prev) =>
+      prev.map((row, i) => {
+        if (i !== index) return row;
+        if (field === "listInput") {
+          return {
+            ...row,
+            listInput: value,
+            listItems: value.split("\n").map((s) => s.trim()).filter(Boolean),
+          };
+        }
+        return { ...row, [field]: value };
+      })
+    );
+  }
 
   // ── Auto-slug from name (only when creating) ─────────────────────────────
   function handleNameChange(value: string) {
@@ -163,7 +213,16 @@ export default function ProductForm({ product }: ProductFormProps) {
       isBestSeller,
       isNewArrival,
       isActive,
+      gender: (gender || undefined) as "men" | "women" | "kids" | undefined,
       images: finalImages,
+      attributes: attributes
+        .filter((a) => a.label.trim())
+        .map((a, i) => ({
+          label: a.label.trim(),
+          textContent: a.textContent.trim() || null,
+          listItems: a.listItems.length > 0 ? a.listItems : null,
+          sortOrder: i,
+        })),
     };
 
     startTransition(async () => {
@@ -312,6 +371,27 @@ export default function ProductForm({ product }: ProductFormProps) {
                     placeholder="MRP / strike-through price"
                   />
                 </div>
+              </Field>
+            </CardContent>
+          </Card>
+
+          {/* Tags */}
+          <Card className="border border-slate-200/80 shadow-xs rounded-xl overflow-hidden">
+            <CardHeader className="bg-slate-50/50 border-b border-slate-100 px-6 py-4">
+              <CardTitle className="text-base font-semibold text-slate-900">Classification</CardTitle>
+            </CardHeader>
+            <CardContent className="p-6">
+              <Field label="Gender / Section">
+                <select
+                  value={gender}
+                  onChange={(e) => setGender(e.target.value as "men" | "women" | "kids" | "")}
+                  className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-violet-600 focus:outline-none focus:ring-2 focus:ring-violet-600/15 transition-all"
+                >
+                  <option value="">— None —</option>
+                  <option value="men">Men</option>
+                  <option value="women">Women</option>
+                  <option value="kids">Kids</option>
+                </select>
               </Field>
             </CardContent>
           </Card>
@@ -477,6 +557,63 @@ export default function ProductForm({ product }: ProductFormProps) {
                   onChange={(e) => handleMediaUpload(e.target.files)}
                 />
               </label>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Attributes */}
+        <div className="col-span-full">
+          <Card className="border border-slate-200/80 shadow-xs rounded-xl overflow-hidden">
+            <CardHeader className="bg-slate-50/50 border-b border-slate-100 px-6 py-4 flex flex-row items-center justify-between">
+              <CardTitle className="text-base font-semibold text-slate-900">Product Attributes</CardTitle>
+              <button
+                type="button"
+                onClick={addAttribute}
+                className="flex items-center gap-1.5 text-sm font-semibold text-violet-600 hover:text-violet-800 transition-colors"
+              >
+                <Plus className="size-4" /> Add Attribute
+              </button>
+            </CardHeader>
+            <CardContent className="p-6 grid gap-4">
+              {attributes.length === 0 && (
+                <p className="text-sm text-slate-400 text-center py-4">No attributes yet. Click &quot;Add Attribute&quot; to add PDP sections like FABRIC, CARE INSTRUCTIONS, etc.</p>
+              )}
+              {attributes.map((attr, idx) => (
+                <div key={idx} className="grid gap-3 rounded-lg border border-slate-200 p-4 relative">
+                  <button
+                    type="button"
+                    onClick={() => removeAttribute(idx)}
+                    className="absolute right-3 top-3 text-slate-400 hover:text-red-500 transition-colors"
+                  >
+                    <Trash2 className="size-4" />
+                  </button>
+                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                    <Field label="Label" required>
+                      <Input
+                        value={attr.label}
+                        onChange={(e) => updateAttribute(idx, "label", e.target.value)}
+                        placeholder="e.g. FABRIC, CARE INSTRUCTIONS"
+                      />
+                    </Field>
+                    <Field label="Text / Single Value">
+                      <Input
+                        value={attr.textContent}
+                        onChange={(e) => updateAttribute(idx, "textContent", e.target.value)}
+                        placeholder="e.g. 100% Cotton Twill"
+                      />
+                    </Field>
+                  </div>
+                  <Field label="Bullet List Items (one per line)">
+                    <Textarea
+                      value={attr.listInput}
+                      onChange={(e) => updateAttribute(idx, "listInput", e.target.value)}
+                      placeholder={`Machine wash cold\nDo not bleach\nTumble dry low`}
+                      rows={4}
+                      className="resize-none font-mono text-sm"
+                    />
+                  </Field>
+                </div>
+              ))}
             </CardContent>
           </Card>
         </div>

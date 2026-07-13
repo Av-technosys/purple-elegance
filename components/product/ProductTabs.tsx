@@ -1,16 +1,50 @@
-export default function ProductTabs({ description }: { description?: string | null }) {
-  if (!description) return null;
+type Attribute = {
+  id: string;
+  label: string;
+  textContent?: string | null;
+  listItems?: string[] | null;
+  sortOrder: number;
+};
+
+export default function ProductTabs({ attributes = [] }: { attributes?: Attribute[] }) {
+  if (attributes.length === 0) return null;
 
   return (
-    <section className="mx-auto max-w-[1290px] px-4 py-8 text-[#160903] md:px-8 md:py-12 border-t border-slate-100">
-      <div className="max-w-4xl">
-        <h2 className="font-heading text-[16px] font-bold tracking-normal uppercase text-[#160903] mb-4">
-          Description
-        </h2>
-        <div className="text-[14px] leading-relaxed text-[#3F322B] whitespace-pre-line">
-          {description}
-        </div>
-      </div>
+    <section className="mx-auto grid max-w-[1290px] gap-8 px-4 py-10 text-[#160903] md:grid-cols-[1.4fr_0.7fr_0.8fr_1fr] md:px-8 md:py-18">
+      {attributes.map((attr) => (
+        <DetailBlock key={attr.id} title={attr.label}>
+          {attr.textContent && (
+            <p className="max-w-[385px] text-[12px] leading-5 text-[#3F322B]">
+              {attr.textContent}
+            </p>
+          )}
+          {attr.listItems && attr.listItems.length > 0 && (
+            <ul className={`space-y-3 text-[12px] text-[#3F322B] ${attr.textContent ? "mt-7" : ""}`}>
+              {attr.listItems.map((item, i) => (
+                <li key={i}>• {item}</li>
+              ))}
+            </ul>
+          )}
+        </DetailBlock>
+      ))}
     </section>
   );
 }
+
+function DetailBlock({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div>
+      <h2 className="font-heading text-[13px] font-bold tracking-normal">
+        {title}
+      </h2>
+      <div className="mt-3">{children}</div>
+    </div>
+  );
+}
+

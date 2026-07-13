@@ -39,11 +39,17 @@ export const productService = {
     return product
   },
 
+  getBySlug: async (slug: string) => {
+    const product = await productRepository.findBySlug(slug)
+    if (!product) throw new Error("Product not found")
+    return product
+  },
+
   create: async (input: CreateProductInput) => {
     const parsed = createProductSchema.safeParse(input)
     if (!parsed.success) throw new Error(JSON.stringify(parsed.error.flatten().fieldErrors))
 
-    const { images, ...productData } = parsed.data
+    const { images, attributes, ...productData } = parsed.data
 
     const product = await productRepository.create({
       name: productData.name,
@@ -52,6 +58,7 @@ export const productService = {
       price: productData.price,
       comparePrice: productData.comparePrice || null,
       categoryId: productData.categoryId ?? null,
+      gender: productData.gender ?? null,
       stock: productData.stock,
       sku: productData.sku ?? null,
       tags: productData.tags ?? null,
@@ -61,9 +68,11 @@ export const productService = {
       isActive: productData.isActive,
     })
 
-    // Attach images if provided
     if (images && images.length > 0) {
       await productRepository.setImages(product.id, images)
+    }
+    if (attributes && attributes.length > 0) {
+      await productRepository.setAttributes(product.id, attributes)
     }
 
     return product
@@ -76,20 +85,23 @@ export const productService = {
     const existing = await productRepository.findById(id)
     if (!existing) throw new Error("Product not found")
 
-    const { images, ...productData } = parsed.data
+    const { images, attributes, ...productData } = parsed.data
 
     const product = await productRepository.update(id, {
       ...productData,
       price: productData.price,
       comparePrice: productData.comparePrice || null,
       categoryId: productData.categoryId ?? null,
+      gender: productData.gender ?? null,
       sku: productData.sku ?? null,
       tags: productData.tags ?? null,
     })
 
-    // Update images if provided
     if (images && images.length > 0) {
       await productRepository.setImages(id, images)
+    }
+    if (attributes && attributes.length > 0) {
+      await productRepository.setAttributes(id, attributes)
     }
 
     return product

@@ -24,11 +24,13 @@ export async function getFullProduct(id: string) {
   }
 }
 
-// ── GET BY SLUG ──────────────────────────────────────────────────────────────
+// ── GET BY SLUG (for PDP) ────────────────────────────────────────────────────
 export async function getProductBySlug(slug: string) {
   try {
     return await productService.getBySlug(slug)
-  } catch {
+  } catch (error) {
+    // Log so we can see DB errors in the terminal instead of silent 404s
+    console.error(`[getProductBySlug] failed for slug "${slug}":`, error)
     return null
   }
 }
