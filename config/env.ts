@@ -1,6 +1,5 @@
 // Database 
 export const DATABASE_URL = process.env.DATABASE_URL!
-export const DATABASE_DIRECT_URL = process.env.DATABASE_DIRECT_URL!
 
 //  AWS General 
 export const AWS_REGION = process.env.AWS_REGION!
