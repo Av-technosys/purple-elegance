@@ -10,7 +10,6 @@ export const AWS_SECRET_ACCESS_KEY = process.env.AWS_SECRET_ACCESS_KEY!
 export const USER_POOL_ID = process.env.COGNITO_USER_POOL_ID!
 export const COGNITO_CLIENT_ID = process.env.COGNITO_CLIENT_ID!
 export const COGNITO_CLIENT_SECRET = process.env.COGNITO_CLIENT_SECRET!
-export const COGNITO_DOMAIN = process.env.COGNITO_DOMAIN!
 
 //  AWS SES 
 export const SES_FROM_EMAIL = process.env.SES_FROM_EMAIL!

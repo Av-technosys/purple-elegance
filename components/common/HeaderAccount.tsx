@@ -1,12 +1,10 @@
-import Image from "next/image";
-
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 export type HeaderAccountUser = {
   name: string;
   email: string;
-  avatar: string;
+  avatar?: string | null;
 };
 
 export default function HeaderAccount({
@@ -15,17 +13,9 @@ export default function HeaderAccount({
   user?: HeaderAccountUser | null;
 }) {
   if (user) {
+
     return (
-      <div className="flex items-center gap-3">
-        <div className="relative size-[46px] overflow-hidden rounded-full bg-[#E8D0B4]">
-          <Image
-            src={user.avatar}
-            alt={user.name}
-            fill
-            className="object-cover object-[50%_20%]"
-            sizes="46px"
-          />
-        </div>
+      <div className="flex items-center gap-1 py-1">
         <div className="min-w-0 text-[#140A05]">
           <p className="truncate text-[20px] leading-tight font-semibold">
             {user.name}
