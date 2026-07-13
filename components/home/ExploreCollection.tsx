@@ -127,17 +127,26 @@ export default function ExploreCollection() {
         {/* Title Block with custom Lotus Flower logo */}
         <div className="text-center flex flex-col items-center">
           <svg
-            className="h-7 w-7 text-[#7F5240] mb-3 opacity-90"
-            viewBox="0 0 24 24"
+            className="h-8 w-11 text-[#7F5240] mb-3 opacity-95"
+            viewBox="0 0 64 36"
             fill="none"
             stroke="currentColor"
-            strokeWidth="1.2"
+            strokeWidth="2.2"
             strokeLinecap="round"
             strokeLinejoin="round"
           >
-            <path d="M12 21c-2-2.5-5-5-5-8.5C7 9.5 9 8 12 8s5 1.5 5 4.5c0 3.5-3 6-5 8.5z" />
-            <path d="M12 21c-1.5-3-3-6-3-8.5C9 10 10.5 9 12 9s3 1 3 3.5c0 2.5-1.5 5.5-3 8.5z" />
-            <path d="M12 21c-3-2-6-4.5-6-7.5 0-2.5 1.5-4 4-4s3.5 1 4 3c.5-2 1.5-3 4-3s4 1.5 4 4c0 3-3 5.5-6 7.5z" />
+            {/* Center petal - shorter and wider */}
+            <path d="M32 4 C32 4, 24 16, 32 30 C32 30, 40 16, 32 4 Z" fill="currentColor" fillOpacity="0.15" />
+            {/* Left inner petal */}
+            <path d="M32 10 C32 10, 16 16, 26 29 C28 30, 30 30, 32 30" />
+            {/* Right inner petal */}
+            <path d="M32 10 C32 10, 48 16, 38 29 C36 30, 34 30, 32 30" />
+            {/* Left outer petal - wide wing */}
+            <path d="M32 16 C32 16, 8 20, 18 31 C22 31, 26 31, 30 30" />
+            {/* Right outer petal - wide wing */}
+            <path d="M32 16 C32 16, 56 20, 46 31 C42 31, 38 31, 34 30" />
+            {/* Base curved leaf line */}
+            <path d="M22 31 C26 34, 38 34, 42 31" />
           </svg>
           <p className="text-[11px] sm:text-[13px] font-semibold tracking-[0.14em] text-[#7F5240]">
             EXPLORE • OUR • COLLECTION

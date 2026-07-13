@@ -1,31 +1,57 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { Check, Truck, MapPin } from "lucide-react"
 
-const orderItems = [
-  {
-    id: "red-embroidered-suit",
-    title: "Red Embroidered Suit",
-    subtitle: "Ethnic Suit",
-    price: 2648,
-    quantity: 1,
-    image:
-      "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=500&q=80",
-  },
-  {
-    id: "beige-embroidered-suit",
-    title: "Beige Embroidered Suit",
-    subtitle: "Ethnic Suit",
-    price: 2648,
-    quantity: 1,
-    image:
-      "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=500&q=80",
-  },
-]
-
 export default function OrderConfirmationPage() {
+  const [items, setItems] = useState<any[]>([])
+  const [address, setAddress] = useState<any>(null)
+  const [orderNumber, setOrderNumber] = useState("")
+  const [deliveryRange, setDeliveryRange] = useState("")
+
+  useEffect(() => {
+    // Load last order details
+    const savedOrder = localStorage.getItem("purple-elegance-last-order")
+    if (savedOrder) {
+      try {
+        setItems(JSON.parse(savedOrder))
+      } catch (e) {
+        console.error("Error parsing last order", e)
+      }
+    }
+
+    // Load default address
+    const savedAddresses = localStorage.getItem("purple-elegance-addresses")
+    if (savedAddresses) {
+      try {
+        const list = JSON.parse(savedAddresses)
+        const def = list.find((addr: any) => addr.isDefault) || list[0]
+        setAddress(def)
+      } catch (e) {
+        console.error("Error parsing address for confirmation", e)
+      }
+    }
+
+    // Generate random order number
+    const num = "PE" + Math.floor(10000000 + Math.random() * 90000000)
+    setOrderNumber(num)
+
+    // Generate dynamic delivery range (3 to 6 days from today)
+    const options: Intl.DateTimeFormatOptions = { day: "numeric", month: "short" }
+    const start = new Date()
+    start.setDate(start.getDate() + 3)
+    const end = new Date()
+    end.setDate(end.getDate() + 6)
+    
+    setDeliveryRange(`${start.toLocaleDateString("en-US", options)} - ${end.toLocaleDateString("en-US", options)}, ${start.getFullYear()}`)
+  }, [])
+
+  const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  const discount = items.length > 0 ? Math.round(subtotal * 0.1) : 0
+  const taxes = Math.round((subtotal - discount) * 0.05)
+  const total = subtotal - discount + taxes
   return (
     <main className="bg-white px-4 pb-16 pt-24 md:px-33.75">
       <div className="mx-auto max-w-[1672px]">
@@ -69,7 +95,7 @@ export default function OrderConfirmationPage() {
           </div>
 
           <h2 className="font-heading text-[28px] font-medium text-slate-900 md:text-[32px]">
-            Thank You, John!
+            Thank You, {address?.fullName || "Guest"}!
           </h2>
           <p className="mt-2 text-[13px] text-slate-500">
             Your order has been placed successfully.
@@ -80,13 +106,12 @@ export default function OrderConfirmationPage() {
               Order Number
             </span>
             <span className="mt-1 text-[18px] font-semibold text-[#10B981]">
-              PE12567890
+              {orderNumber}
             </span>
           </div>
 
           <p className="mt-6 max-w-sm text-[12px] leading-relaxed text-slate-500">
-            We've sent a confirmation email to{" "}
-            <span className="font-semibold text-slate-800">john.doe@email.com</span>
+            We've sent a confirmation email to your registered email address.
           </p>
 
           <Link
@@ -103,7 +128,7 @@ export default function OrderConfirmationPage() {
             Order Summary
           </h3>
           <div className="space-y-4">
-            {orderItems.map((item) => (
+            {items.map((item) => (
               <div
                 key={item.id}
                 className="flex items-start gap-4 border-b border-gray-100 pb-4 last:border-b-0 last:pb-0"
@@ -142,12 +167,12 @@ export default function OrderConfirmationPage() {
             </h4>
             <div className="space-y-3 text-[12px] text-slate-600">
               <div className="flex justify-between">
-                <span>Subtotal (3 Items)</span>
-                <span className="font-medium text-slate-900">₹5,297</span>
+                <span>Subtotal ({items.reduce((sum, item) => sum + item.quantity, 0)} Items)</span>
+                <span className="font-medium text-slate-900">₹{subtotal.toLocaleString()}</span>
               </div>
               <div className="flex justify-between text-emerald-600">
                 <span>Discount</span>
-                <span className="font-semibold">- ₹1,199</span>
+                <span className="font-semibold">- ₹{discount.toLocaleString()}</span>
               </div>
               <div className="flex justify-between text-emerald-600">
                 <span>Shipping</span>
@@ -160,7 +185,7 @@ export default function OrderConfirmationPage() {
                 <span className="text-[15px] font-bold text-slate-900">Total</span>
                 <div className="text-right">
                   <span className="text-[20px] font-bold text-slate-900">
-                    ₹4,098
+                    ₹{total.toLocaleString()}
                   </span>
                   <p className="mt-0.5 text-[9px] font-medium uppercase tracking-wider text-slate-400">
                     Inclusive of all taxes
@@ -181,7 +206,7 @@ export default function OrderConfirmationPage() {
                 Estimated Delivery
               </h4>
               <p className="mt-1 text-[12px] text-slate-500">
-                24 May - 27 May, 2025
+                {deliveryRange}
               </p>
             </div>
           </div>
@@ -194,9 +219,21 @@ export default function OrderConfirmationPage() {
                 Shipping Address
               </h4>
               <div className="mt-1 text-[12px] leading-relaxed text-slate-500">
-                <p className="font-medium text-slate-700">John Doe</p>
-                <p>123 Park Street, Mumbai,</p>
-                <p>Maharashtra - 400001</p>
+                {address ? (
+                  <>
+                    <p className="font-medium text-slate-700">{address.fullName}</p>
+                    <p>{address.addressLine1}</p>
+                    {address.addressLine2 && <p>{address.addressLine2}</p>}
+                    <p>{address.city}, {address.state} - {address.zip}</p>
+                    <p className="mt-1 text-[11px] font-medium text-slate-500">Mobile: {address.phone}</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="font-medium text-slate-700">John Doe</p>
+                    <p>123 Park Street, Mumbai,</p>
+                    <p>Maharashtra - 400001</p>
+                  </>
+                )}
               </div>
             </div>
           </div>
