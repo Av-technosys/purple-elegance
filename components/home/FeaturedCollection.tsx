@@ -8,8 +8,9 @@ import { motion } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useGenderTheme } from "@/helper/useGenderTheme";
 
-const collections = [
+const collectionsData = [
   {
     title: "Festive Collection",
     categoryKey: "Festive Collection",
@@ -48,8 +49,7 @@ const collections = [
   },
 ];
 
-const getWrappedOffset = (index: number, activeIndex: number) => {
-  const count = collections.length;
+const getWrappedOffset = (index: number, activeIndex: number, count: number) => {
   const rawOffset = (index - activeIndex + count) % count;
 
   return rawOffset > Math.floor(count / 2) ? rawOffset - count : rawOffset;
@@ -57,6 +57,8 @@ const getWrappedOffset = (index: number, activeIndex: number) => {
 
 export default function FeaturedCollection() {
   const [activeIndex, setActiveIndex] = useState(2);
+  const theme = useGenderTheme();
+  const collections = theme.featuredCollections;
 
   const move = (direction: "next" | "previous") => {
     setActiveIndex((current) => {
@@ -113,7 +115,7 @@ export default function FeaturedCollection() {
 
           <div className="relative mx-auto h-[360px] max-w-[1040px] overflow-hidden sm:h-[438px]">
             {collections.map((collection, index) => {
-              const offset = getWrappedOffset(index, activeIndex);
+              const offset = getWrappedOffset(index, activeIndex, collections.length);
               const isActive = offset === 0;
               const isInnerCard = Math.abs(offset) === 1;
               const xPositionByOffset = {

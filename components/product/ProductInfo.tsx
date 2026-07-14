@@ -68,12 +68,18 @@ export default function ProductInfo({
     localStorage.setItem("purple-elegance-wishlist", JSON.stringify(updated));
   };
 
+  const isMen = product.slug.includes("men") || product.slug.includes("kurta") || product.slug.includes("sherwani") || product.slug.includes("jacket") || product.slug.includes("shirt");
+  const isKids = product.slug.includes("kids") || product.slug.includes("boy") || product.slug.includes("girl") || product.slug.includes("baby") || product.slug.includes("lehenga");
+  
+  const genderLabel = isMen ? "Men" : isKids ? "Kids" : "Women";
+  const genderLink = isMen ? "/men" : isKids ? "/kids" : "/";
+
   return (
     <section className="text-[#160903]">
       <p className="hidden text-[11px] text-[#4D4038] md:block select-none">
         <Link href="/" className="hover:underline transition-all">Home</Link>
         <span className="mx-1.5">&gt;</span>
-        <Link href="/product" className="hover:underline transition-all">Women</Link>
+        <Link href={genderLink} className="hover:underline transition-all">{genderLabel}</Link>
         <span className="mx-1.5">&gt;</span>
         <Link href="/product" className="hover:underline transition-all">Ethnic Wear</Link>
         <span className="mx-1.5">&gt;</span>

@@ -274,32 +274,54 @@ const Header = ({ user }: HeaderProps) => {
               transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] as const }}
               id="mobile-menu-drawer"
               aria-label="Mobile menu"
-              className="relative z-10 flex h-full w-[296px] max-w-[calc(100vw-28px)] flex-col bg-white px-4 py-5 text-[#140A05] shadow-[14px_0_34px_rgba(0,0,0,0.12)]"
+              className="relative z-10 flex h-full w-[310px] max-w-[calc(100vw-28px)] flex-col bg-white px-6 py-8 text-[#140A05] shadow-[14px_0_34px_rgba(0,0,0,0.12)]"
             >
               <HeaderAccount user={accountUser} />
 
-              <div className="mt-7 grid grid-cols-3 gap-7">
-                {audienceTabs.map((tab) => {
-                  const isActive = pathname === `/${tab.toLowerCase()}`;
-                  return (
-                    <Link
-                      key={tab}
-                      href={`/${tab.toLowerCase()}`}
-                      onClick={() => {
-                        setIsMenuOpen(false);
-                        setAllowClose(false);
-                      }}
-                      className={[
-                        "h-[26px] rounded-[3px] border border-[#351300] text-[11px] font-semibold flex items-center justify-center transition-all",
-                        isActive
-                          ? "bg-[#351300] text-white"
-                          : "bg-white text-[#140A05] hover:bg-slate-50",
-                      ].join(" ")}
-                    >
-                      {tab}
-                    </Link>
-                  );
-                })}
+            <div className="mt-7 grid grid-cols-3 gap-2.5">
+              {audienceTabs.map((tab) => {
+                const targetPath = tab === "Women" ? "/" : `/${tab.toLowerCase()}`;
+                const isActive = pathname === targetPath;
+                return (
+                  <Link
+                    key={tab}
+                    href={targetPath}
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      setAllowClose(false);
+                    }}
+                    className={[
+                      "h-[34px] rounded-[3px] border border-[#351300] text-[11px] font-semibold flex items-center justify-center transition-all cursor-pointer",
+                      isActive
+                        ? "bg-[#351300] text-white"
+                        : "bg-white text-[#140A05] hover:bg-slate-50",
+                    ].join(" ")}
+                  >
+                    {tab}
+                  </Link>
+                );
+              })}
+            </div>
+
+            <nav className="mt-8" aria-label="Drawer navigation">
+              <h2 className="font-heading text-[18px] leading-none tracking-[0.3em] font-semibold text-[#351300]">
+                SHOP
+              </h2>
+              <span className="mt-3.5 block h-px w-[36px] bg-[#351300]" />
+              <div className="mt-6 divide-y divide-[#EADECB]">
+                {menuItems.map((item) => (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      setAllowClose(false);
+                    }}
+                    className="block py-4 text-[15px] leading-none font-medium text-[#2A0C00] hover:text-[#C18A48] transition-colors"
+                  >
+                    {item.name}
+                  </Link>
+                ))}
               </div>
 
               <nav className="mt-8" aria-label="Drawer navigation">

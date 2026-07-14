@@ -5,8 +5,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { IconHeart } from "@tabler/icons-react";
 import { motion } from "framer-motion";
+import { useGenderTheme } from "@/helper/useGenderTheme";
 
-const products = [
+const productsData = [
   {
     name: "Red Embroidered Suit",
     position: "object-[center_18%]",
@@ -51,6 +52,8 @@ const products = [
 
 export default function NewArrival() {
   const [wishlist, setWishlist] = useState<string[]>([]);
+  const theme = useGenderTheme();
+  const products = theme.products;
   
   useEffect(() => {
     setWishlist(JSON.parse(localStorage.getItem("purple-elegance-wishlist") || "[]"));
@@ -84,8 +87,9 @@ export default function NewArrival() {
 
         <div className="mt-7 grid grid-cols-2 gap-x-[10px] gap-y-7 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
           {products.map((product, index) => {
-            const productSlug = product.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "");
+            const productSlug = product.slug || product.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "");
             const isLiked = wishlist.includes(productSlug);
+            const imageSrc = product.image || "/sample-product.png";
             return (
               <motion.article
                 initial={{ opacity: 0, y: 20 }}
@@ -98,7 +102,7 @@ export default function NewArrival() {
                 <div className="relative aspect-[236/331] overflow-hidden bg-[#ead0b0]">
                   <Link href={`/products/${productSlug}`} className="block w-full h-full relative">
                     <Image
-                      src="/sample-product.png"
+                      src={imageSrc}
                       alt={product.name}
                       fill
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
@@ -117,13 +121,13 @@ export default function NewArrival() {
                   </button>
                 </div>
               <div className="pt-3">
-                <Link href={`/products/${product.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "")}`} className="block">
+                <Link href={`/products/${productSlug}`} className="block">
                   <h3 className="text-[15px] leading-tight font-medium text-black">
                     {product.name}
                   </h3>
                 </Link>
                 <p className="mt-1 text-[14px] leading-none text-black">
-                  ₹1,099
+                  {product.price || "₹1,099"}
                 </p>
               </div>
             </motion.article>

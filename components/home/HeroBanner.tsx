@@ -13,6 +13,7 @@ import { motion } from "framer-motion"
 
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import { useGenderTheme } from "@/helper/useGenderTheme"
 
 const benefits = [
   {
@@ -65,25 +66,27 @@ const itemVariants = {
 }
 
 export default function HeroBanner() {
+  const theme = useGenderTheme()
+
   return (
     <section className="relative overflow-hidden bg-[#f7ead8] text-[#2A0C00]">
       <div className="relative hidden aspect-[1672/941] min-h-[610px] md:block">
         <Image
-          src="/home-banner.png"
+          src={theme.heroBannerDesktop}
           alt="Purple Elegance everyday ethnic collection"
           fill
           priority
           className="object-cover object-center"
           sizes="100vw"
         />
-        <HeroCopy className="absolute top-[18.5%] left-1/2 w-[520px] -translate-x-1/2" />
+        <HeroCopy theme={theme} className="absolute top-[18.5%] left-1/2 w-[520px] -translate-x-1/2" />
         <BenefitStrip className="absolute right-[6.6%] bottom-[3.2%] left-[6.6%]" />
       </div>
 
       <div className="relative block md:hidden">
         <div className="relative h-[302px]">
           <Image
-            src="/mobile-banner.png"
+            src={theme.heroBannerMobile}
             alt="Purple Elegance everyday ethnic collection"
             fill
             priority
@@ -94,7 +97,7 @@ export default function HeroBanner() {
         </div>
 
         <div className="-mt-px bg-[#fbf2e7] px-6 pb-7 pt-3 text-center">
-          <HeroCopy />
+          <HeroCopy theme={theme} />
           <BenefitStrip />
         </div>
       </div>
@@ -102,7 +105,7 @@ export default function HeroBanner() {
   )
 }
 
-function HeroCopy({ className = "" }: { className?: string }) {
+function HeroCopy({ theme, className = "" }: { theme: any; className?: string }) {
   return (
     <motion.div
       initial="hidden"
@@ -110,24 +113,39 @@ function HeroCopy({ className = "" }: { className?: string }) {
       variants={containerVariants}
       className={`text-center ${className}`}
     >
-      <motion.p variants={itemVariants} className="flex items-center justify-center gap-2 text-[10px] font-bold tracking-[0.08em] text-[#5F4B35] sm:text-[12px]">
+      <motion.p variants={itemVariants} className="flex items-center justify-center gap-2 text-[10px] font-bold tracking-[0.08em] text-[#5F4B35] sm:text-[12px] uppercase">
         <IconArrowRight size={14} stroke={1.4} />
-        EFFORTLESS ELEGANCE
+        {theme.gender === "kids" ? "KIDS FESTIVE SPECIAL" : "EFFORTLESS ELEGANCE"}
         <IconArrowRight size={14} stroke={1.4} className="rotate-180" />
       </motion.p>
       <motion.span variants={itemVariants} className="mx-auto mt-3 block size-1.5 rounded-full bg-[#2A0C00]" />
-      <motion.h1 variants={itemVariants} className="mt-3 text-[38px] leading-[0.98] font-semibold tracking-[-0.025em] text-[#3A1A12] sm:text-[58px] lg:text-[76px]">
-        Effortless Style,
-        <br />
-        <span className="text-[#A8484D]">Everyday You.</span>
-      </motion.h1>
-      <motion.p variants={itemVariants} className="mx-auto mt-5 max-w-[360px] text-[12px] leading-5 text-[#4E3E34] sm:text-[14px] sm:leading-6">
-        Thoughtfully designed prints and silhouettes that bring comfort, charm
-        and confidence to every moment.
-      </motion.p>
+      
+      {theme.gender === "women" ? (
+        <>
+          <motion.h1 variants={itemVariants} className="mt-3 text-[38px] leading-[0.98] font-semibold tracking-[-0.025em] text-[#3A1A12] sm:text-[58px] lg:text-[76px]">
+            Effortless Style,
+            <br />
+            <span className="text-[#A8484D]">Everyday You.</span>
+          </motion.h1>
+          <motion.p variants={itemVariants} className="mx-auto mt-5 max-w-[360px] text-[12px] leading-5 text-[#4E3E34] sm:text-[14px] sm:leading-6">
+            Thoughtfully designed prints and silhouettes that bring comfort, charm
+            and confidence to every moment.
+          </motion.p>
+        </>
+      ) : (
+        <>
+          <motion.h1 variants={itemVariants} className="mt-3 text-[38px] leading-[0.98] font-semibold tracking-[-0.025em] text-[#3A1A12] sm:text-[58px] lg:text-[76px] uppercase">
+            {theme.heroTitle}
+          </motion.h1>
+          <motion.p variants={itemVariants} className="mx-auto mt-5 max-w-[360px] text-[12px] leading-5 text-[#4E3E34] sm:text-[14px] sm:leading-6">
+            {theme.heroSubtitle} {theme.heroDesc}
+          </motion.p>
+        </>
+      )}
+
       <motion.div variants={itemVariants}>
         <Link href="product">
-          <Button className="mt-7 h-[42px] w-full max-w-[230px] rounded-[3px] bg-[#A8484D] px-8 text-[11px] font-semibold tracking-[0.04em] text-white hover:bg-[#913d42] sm:h-[50px] sm:max-w-[318px] sm:text-[14px]">
+          <Button className="mt-7 h-[42px] w-full max-w-[230px] rounded-[3px] bg-[#A8484D] px-8 text-[11px] font-semibold tracking-[0.04em] text-white hover:bg-[#913d42] sm:h-[50px] sm:max-w-[318px] sm:text-[14px] cursor-pointer">
             SHOP NEW ARRIVALS
             <IconArrowRight size={17} stroke={1.7} />
           </Button>

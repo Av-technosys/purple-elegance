@@ -2,8 +2,11 @@
 
 import Image from "next/image"
 import { motion } from "framer-motion"
+import { useGenderTheme } from "@/helper/useGenderTheme"
 
 export default function HeritageThreads() {
+  const theme = useGenderTheme()
+
   return (
     <section className="relative w-full overflow-hidden bg-[#efd7bd]">
       {/* Container aspect ratio shifts dynamically for mobile vs desktop */}
@@ -12,7 +15,7 @@ export default function HeritageThreads() {
         {/* Mobile Background Image (block sm:hidden) */}
         <div className="block sm:hidden absolute inset-0">
           <Image
-            src="/heritage-mobile.png"
+            src={theme.heritageBgMobile}
             alt="Heritage ethnic wear collection mobile"
             fill
             priority
@@ -24,7 +27,7 @@ export default function HeritageThreads() {
         {/* Desktop Background Image (hidden sm:block) */}
         <div className="hidden sm:block absolute inset-0">
           <Image
-            src="/heritage-thread-bg.png"
+            src={theme.heritageBgDesktop}
             alt="Heritage ethnic wear collection"
             fill
             priority
