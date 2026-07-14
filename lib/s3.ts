@@ -8,10 +8,10 @@ function getS3Region() {
 }
 
 function getS3BucketName() {
-  const bucketName = process.env.AWS_BUCKET
+  const bucketName = process.env.AWS_BUCKET || process.env.S3_BUCKET_NAME
 
   if (!bucketName) {
-    throw new Error('Missing AWS_BUCKET')
+    throw new Error('Missing AWS_BUCKET or S3_BUCKET_NAME environment variable')
   }
 
   return bucketName
@@ -20,6 +20,7 @@ function getS3BucketName() {
 function getS3ClientConfig(): S3ClientConfig {
   const accessKeyId =
     process.env.S3_ACCESS_KEY_ID ??
+    process.env.AWS_ACCESS_KEY_ID ??
     process.env.ACCESS_KEY_ID ??
     process.env.ACCESS_KEY
   const secretAccessKey =
