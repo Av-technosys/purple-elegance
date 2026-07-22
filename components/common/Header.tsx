@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import Image from "next/image";
 import {
   IconHeart,
@@ -10,34 +10,65 @@ import {
 } from "@tabler/icons-react";
 
 import { Button } from "@/components/ui/button";
-import HeaderAccount, { HeaderAccountUser } from "@/components/common/HeaderAccount";
+import HeaderAccount from "@/components/common/HeaderAccount";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
+import { logoutAction } from "@/server/modules/auth/auth.actions";
 
-const mockUser: HeaderAccountUser = {
-  name: "John Doe",
-  email: "john.doe@gmail.com",
-  avatar: "/sample-insta.png",
-};
-
-const isMockLoggedIn = false;
+interface HeaderProps {
+  user?: {
+    id: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    role: string;
+  } | null;
+}
 
 const audienceTabs = ["Men", "Women", "Kids"];
 
 const menuItems = [
   { name: "Home", href: "/" },
   { name: "Shop", href: "/product" },
-  { name: "New Arrivals", href: "/product" },
-  { name: "Best Sellers", href: "/product" },
+  { name: "New Arrivals", href: "/#new-arrivals" },
+  { name: "Best Sellers", href: "/#best-sellers" },
   { name: "About Us", href: "/about" },
   { name: "Contact Us", href: "/contact" },
 ];
 
-const Header = () => {
+const Header = ({ user }: HeaderProps) => {
+  const pathname = usePathname();
+  const [isPending, startTransition] = useTransition();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [allowClose, setAllowClose] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [cartCount, setCartCount] = useState(0);
+  const [wishlistCount, setWishlistCount] = useState(0);
+
+  const updateCounts = () => {
+    try {
+      const cart = JSON.parse(localStorage.getItem("purple-elegance-cart") || "[]");
+      const totalQty = cart.reduce((sum: number, item: any) => sum + (item.quantity || 1), 0);
+      setCartCount(totalQty);
+
+      const wishlist = JSON.parse(localStorage.getItem("purple-elegance-wishlist") || "[]");
+      setWishlistCount(wishlist.length);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  useEffect(() => {
+    updateCounts();
+    window.addEventListener("storage", updateCounts);
+    const interval = setInterval(updateCounts, 1000);
+    return () => {
+      window.removeEventListener("storage", updateCounts);
+      clearInterval(interval);
+    };
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -50,7 +81,18 @@ const Header = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-  const accountUser = isMockLoggedIn ? mockUser : null;
+
+  const accountUser = user ? {
+    name: `${user.firstName} ${user.lastName}`.trim() || user.email.split("@")[0],
+    email: user.email,
+    avatar: null,
+  } : null;
+
+  const finalMenuItems = [...menuItems];
+  if (user) {
+    const dashboardHref = user.role === "admin" ? "/admin" : "/dashboard";
+    finalMenuItems.push({ name: "Dashboard", href: dashboardHref });
+  }
 
   const closeMenu = () => {
     if (allowClose) {
@@ -72,6 +114,12 @@ const Header = () => {
   };
 
   const toggleSearch = () => setIsSearchOpen((prev) => !prev);
+
+  const handleLogout = () => {
+    startTransition(async () => {
+      await logoutAction();
+    });
+  };
 
   useEffect(() => {
     if (!isMenuOpen) {
@@ -164,12 +212,46 @@ const Header = () => {
               aria-label="Wishlist"
               className="flex size-7 items-center justify-center md:size-8 cursor-pointer text-[#140A05]"
             >
-              <IconHeart size={25} stroke={2} />
+              <div className="relative">
+                <IconHeart size={25} stroke={2} />
+                {wishlistCount > 0 && (
+                  <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#351300] text-[8px] font-bold text-white shadow-xs">
+                    {wishlistCount}
+                  </span>
+                )}
+              </div>
             </Link>
 
-            <Link href="/cart" aria-label="Shopping bag" className="flex size-7 items-center justify-center md:size-8">
-              <IconShoppingBag size={25} stroke={2} />
+            <Link 
+              href="/cart" 
+              aria-label="Shopping bag" 
+              className="flex size-7 items-center justify-center md:size-8 text-[#140A05]"
+            >
+              <div className="relative">
+                <IconShoppingBag size={25} stroke={2} />
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#B91C1C] text-[8px] font-bold text-white shadow-xs">
+                    {cartCount}
+                  </span>
+                )}
+              </div>
             </Link>
+
+            {user ? (
+              <Link
+                href={user.role === "admin" ? "/admin" : "/dashboard"}
+                className="ml-1 hidden items-center justify-center rounded-[3px] bg-[#351300] px-4.5 py-1.5 text-[12px] font-semibold text-white hover:bg-[#4A1B04] transition-all sm:flex"
+              >
+                Dashboard
+              </Link>
+            ) : (
+              <Link
+                href="/login"
+                className="ml-1 hidden items-center justify-center rounded-[3px] border border-[#351300] px-4.5 py-1.5 text-[12px] font-semibold text-[#140A05] hover:bg-[#F8EAD8] transition-all sm:flex"
+              >
+                Login
+              </Link>
+            )}
           </nav>
         </div>
       </header>
@@ -192,33 +274,41 @@ const Header = () => {
               transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] as const }}
               id="mobile-menu-drawer"
               aria-label="Mobile menu"
-              className="relative z-10 flex h-full w-[296px] max-w-[calc(100vw-28px)] flex-col bg-white px-4 py-5 text-[#140A05] shadow-[14px_0_34px_rgba(0,0,0,0.12)]"
+              className="relative z-10 flex h-full w-[310px] max-w-[calc(100vw-28px)] flex-col bg-white px-6 py-8 text-[#140A05] shadow-[14px_0_34px_rgba(0,0,0,0.12)]"
             >
-            <HeaderAccount user={accountUser} />
+              <HeaderAccount user={accountUser} />
 
-            <div className="mt-7 grid grid-cols-3 gap-7">
-              {audienceTabs.map((tab, index) => (
-                <button
-                  key={tab}
-                  type="button"
-                  className={[
-                    "h-[26px] rounded-[3px] border border-[#351300] text-[11px] font-semibold",
-                    index === 0
-                      ? "bg-[#351300] text-white"
-                      : "bg-white text-[#140A05]",
-                  ].join(" ")}
-                >
-                  {tab}
-                </button>
-              ))}
+            <div className="mt-7 grid grid-cols-3 gap-2.5">
+              {audienceTabs.map((tab) => {
+                const targetPath = tab === "Women" ? "/" : `/${tab.toLowerCase()}`;
+                const isActive = pathname === targetPath;
+                return (
+                  <Link
+                    key={tab}
+                    href={targetPath}
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      setAllowClose(false);
+                    }}
+                    className={[
+                      "h-[34px] rounded-[3px] border border-[#351300] text-[11px] font-semibold flex items-center justify-center transition-all cursor-pointer",
+                      isActive
+                        ? "bg-[#351300] text-white"
+                        : "bg-white text-[#140A05] hover:bg-slate-50",
+                    ].join(" ")}
+                  >
+                    {tab}
+                  </Link>
+                );
+              })}
             </div>
 
             <nav className="mt-8" aria-label="Drawer navigation">
-              <h2 className="font-heading text-[20px] leading-none tracking-[0.42em]">
+              <h2 className="font-heading text-[18px] leading-none tracking-[0.3em] font-semibold text-[#351300]">
                 SHOP
               </h2>
-              <span className="mt-4 block h-px w-[48px] bg-[#351300]" />
-              <div className="mt-7 divide-y divide-[#C9C0BA]">
+              <span className="mt-3.5 block h-px w-[36px] bg-[#351300]" />
+              <div className="mt-6 divide-y divide-[#EADECB]">
                 {menuItems.map((item) => (
                   <Link
                     key={item.name}
@@ -227,35 +317,60 @@ const Header = () => {
                       setIsMenuOpen(false);
                       setAllowClose(false);
                     }}
-                    className="block py-6 text-[16px] leading-none font-medium"
+                    className="block py-4 text-[15px] leading-none font-medium text-[#2A0C00] hover:text-[#C18A48] transition-colors"
                   >
                     {item.name}
                   </Link>
                 ))}
               </div>
-            </nav>
 
-            <div className="mt-auto space-y-2 pb-3">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setIsMenuOpen(false);
-                  setAllowClose(false);
-                }}
-                className="h-[36px] w-full rounded-none border-[#351300] bg-white text-[12px] font-semibold text-[#140A05] hover:bg-[#F8EAD8]"
-              >
-                Close
-              </Button>
-              {accountUser ? (
-                <Button className="h-[36px] w-full rounded-none bg-[#351300] text-[12px] font-semibold text-white hover:bg-[#4A1B04]">
-                  Logout
+              <nav className="mt-8" aria-label="Drawer navigation">
+                <h2 className="font-heading text-[20px] leading-none tracking-[0.42em]">
+                  SHOP
+                </h2>
+                <span className="mt-4 block h-px w-[48px] bg-[#351300]" />
+                <div className="mt-7 divide-y divide-[#C9C0BA]">
+                  {finalMenuItems.map((item) => (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      onClick={() => {
+                        setIsMenuOpen(false);
+                        setAllowClose(false);
+                      }}
+                      className="block py-6 text-[16px] leading-none font-medium"
+                    >
+                      {item.name}
+                    </Link>
+                  ))}
+                </div>
+              </nav>
+
+              <div className="mt-auto space-y-2 pb-3">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    setAllowClose(false);
+                  }}
+                  className="h-[36px] w-full rounded-none border-[#351300] bg-white text-[12px] font-semibold text-[#140A05] hover:bg-[#F8EAD8]"
+                >
+                  Close
                 </Button>
-              ) : null}
-            </div>
-          </motion.aside>
-        </div>
-      )}
-    </AnimatePresence>
+                {accountUser ? (
+                  <Button
+                    onClick={handleLogout}
+                    disabled={isPending}
+                    className="h-[36px] w-full rounded-none bg-[#351300] text-[12px] font-semibold text-white hover:bg-[#4A1B04]"
+                  >
+                    {isPending ? "Logging out..." : "Logout"}
+                  </Button>
+                ) : null}
+              </div>
+            </motion.aside>
+          </div>
+        )}
+      </AnimatePresence>
     </>
   );
 };

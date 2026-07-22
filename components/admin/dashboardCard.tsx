@@ -35,15 +35,15 @@ type StatCardProps = {
 
 function StatCard({ title, value, subtitle, icon: Icon, color }: StatCardProps) {
   return (
-    <div className="rounded-xl border bg-white p-6 shadow-sm">
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-sm font-medium text-slate-500">{title}</p>
-          <p className="mt-1 text-3xl font-bold text-slate-900">{value}</p>
-          <p className="mt-1 text-xs text-slate-400">{subtitle}</p>
+    <div className="rounded-xl border border-slate-200/80 bg-white p-6 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group">
+      <div className="flex items-center justify-between">
+        <div className="space-y-1.5">
+          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{title}</p>
+          <p className="text-3xl font-extrabold text-slate-900 tracking-tight">{value}</p>
+          <p className="text-xs text-slate-400 font-medium">{subtitle}</p>
         </div>
-        <div className={`rounded-lg p-3 ${color}`}>
-          <Icon className="size-5 text-white" />
+        <div className={`rounded-xl p-3 border shrink-0 transition-transform duration-300 group-hover:scale-110 ${color}`}>
+          <Icon className="size-6" />
         </div>
       </div>
     </div>
@@ -61,34 +61,34 @@ export async function DashboardCards() {
     }).format(amount)
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
       <StatCard
         title="Total Orders"
         value={stats.orders.toLocaleString()}
-        subtitle="All time orders"
+        subtitle="All time orders placed"
         icon={ShoppingCart}
-        color="bg-violet-500"
+        color="bg-violet-50 text-violet-600 border-violet-100"
       />
       <StatCard
         title="Total Revenue"
         value={formatCurrency(stats.revenue)}
-        subtitle="Sum of all order totals"
+        subtitle="Sum of all order payments"
         icon={DollarSign}
-        color="bg-emerald-500"
+        color="bg-emerald-50 text-emerald-600 border-emerald-100"
       />
       <StatCard
         title="Active Products"
         value={stats.products.toLocaleString()}
-        subtitle="Published in store"
+        subtitle="Active products in store"
         icon={Package}
-        color="bg-amber-500"
+        color="bg-amber-50 text-amber-600 border-amber-100"
       />
       <StatCard
         title="Total Users"
         value={stats.users.toLocaleString()}
-        subtitle="Registered customers"
+        subtitle="Registered user base"
         icon={Users}
-        color="bg-sky-500"
+        color="bg-sky-50 text-sky-600 border-sky-100"
       />
     </div>
   )

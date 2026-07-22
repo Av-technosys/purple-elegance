@@ -1,5 +1,6 @@
 "use server"
 
+import { revalidatePath } from "next/cache"
 import { categoryService } from "./category.service"
 import type { CategoryInput, UpdateCategoryInput } from "./category.validations"
 
@@ -40,6 +41,7 @@ export async function getCategoriesPagination(params: {
 export async function createCategory(input: CategoryInput) {
   try {
     const category = await categoryService.create(input)
+    revalidatePath("/admin/category")
     return { success: true, data: category, message: "Category created successfully" }
   } catch (error) {
     return { success: false, data: null, message: (error as Error).message }
@@ -50,6 +52,7 @@ export async function createCategory(input: CategoryInput) {
 export async function updateCategory(id: string, input: UpdateCategoryInput) {
   try {
     const category = await categoryService.update(id, input)
+    revalidatePath("/admin/category")
     return { success: true, data: category, message: "Category updated successfully" }
   } catch (error) {
     return { success: false, data: null, message: (error as Error).message }
@@ -60,6 +63,7 @@ export async function updateCategory(id: string, input: UpdateCategoryInput) {
 export async function deleteCategory(id: string) {
   try {
     await categoryService.delete(id)
+    revalidatePath("/admin/category")
     return { success: true, message: "Category deleted successfully" }
   } catch (error) {
     return { success: false, message: (error as Error).message }

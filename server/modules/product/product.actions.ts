@@ -1,5 +1,6 @@
 "use server"
 
+import { revalidatePath } from "next/cache"
 import { productService } from "./product.service"
 import type { CreateProductInput, UpdateProductInput } from "./product.validations"
 
@@ -23,10 +24,22 @@ export async function getFullProduct(id: string) {
   }
 }
 
+// ── GET BY SLUG (for PDP) ────────────────────────────────────────────────────
+export async function getProductBySlug(slug: string) {
+  try {
+    return await productService.getBySlug(slug)
+  } catch (error) {
+    // Log so we can see DB errors in the terminal instead of silent 404s
+    console.error(`[getProductBySlug] failed for slug "${slug}":`, error)
+    return null
+  }
+}
+
 // ── CREATE ───────────────────────────────────────────────────────────────────
 export async function createProduct(input: CreateProductInput) {
   try {
     const product = await productService.create(input)
+    revalidatePath("/admin/products")
     return { success: true, data: product, message: "Product created successfully" }
   } catch (error) {
     return { success: false, data: null, message: (error as Error).message }
@@ -37,6 +50,7 @@ export async function createProduct(input: CreateProductInput) {
 export async function updateProduct(id: string, input: UpdateProductInput) {
   try {
     const product = await productService.update(id, input)
+    revalidatePath("/admin/products")
     return { success: true, data: product, message: "Product updated successfully" }
   } catch (error) {
     return { success: false, data: null, message: (error as Error).message }
@@ -47,6 +61,7 @@ export async function updateProduct(id: string, input: UpdateProductInput) {
 export async function deleteProduct(id: string) {
   try {
     await productService.delete(id)
+    revalidatePath("/admin/products")
     return { success: true, message: "Product deleted successfully" }
   } catch (error) {
     return { success: false, message: (error as Error).message }

@@ -7,7 +7,7 @@ const footerColumns = [
     links: [
       { label: "New Arrivals", href: "/new-arrivals" },
       { label: "Best Sellers", href: "/best-sellers" },
-      { label: "Women", href: "/women" },
+      { label: "Women", href: "/" },
       { label: "Men", href: "/men" },
     ],
   },

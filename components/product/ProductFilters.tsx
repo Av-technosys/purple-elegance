@@ -1,16 +1,17 @@
+"use client";
+
 import { IconAdjustmentsHorizontal, IconChevronDown } from "@tabler/icons-react";
 import type React from "react";
 
 import { Button } from "@/components/ui/button";
 import { categories } from "@/components/product/product-data";
 
-const sizeOptions = ["38", "32", "34", "36", "38", "40", "42"];
+const sizeOptions = ["32", "34", "36", "38", "40", "42"];
 const fitOptions = [
   "Regular",
   "Straight",
   "Boxy",
   "Slim",
-  "Regular",
   "Relaxed",
   "Tapered",
 ];
@@ -19,7 +20,6 @@ const fabricOptions = [
   "Cotton Twill",
   "Linen",
   "Denim",
-  "Polyester",
   "Polyester",
   "Linen Blend",
 ];
@@ -33,24 +33,53 @@ const colorOptions = [
   "#C5507E",
 ];
 
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense } from "react";
+
 export function ProductCategoryTabs() {
+  return (
+    <Suspense fallback={<div className="h-[60px] bg-white border-b border-[#E6DED5]" />}>
+      <ProductCategoryTabsInner />
+    </Suspense>
+  );
+}
+
+function ProductCategoryTabsInner() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const activeCategory = searchParams.get("category") || "All";
+
+  const handleCategoryClick = (category: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (category === "All") {
+      params.delete("category");
+    } else {
+      params.set("category", category);
+    }
+    router.push(`?${params.toString()}`, { scroll: false });
+  };
+
   return (
     <div className="border-b border-[#E6DED5] bg-white">
       <div className="mx-auto flex max-w-[1220px] gap-3 overflow-x-auto px-4 py-[18px] md:px-6">
-        {categories.map((category, index) => (
-          <button
-            key={category}
-            type="button"
-            className={[
-              "h-[24px] shrink-0 rounded-[2px] border px-5 text-[11px] leading-none transition-colors",
-              index === 0
-                ? "border-[#2A0C00] bg-[#2A0C00] text-white"
-                : "border-[#2A0C00] bg-white text-[#2A0C00] hover:bg-[#F8EAD8]",
-            ].join(" ")}
-          >
-            {category}
-          </button>
-        ))}
+        {categories.map((category) => {
+          const isSelected = activeCategory === category;
+          return (
+            <button
+              key={category}
+              type="button"
+              onClick={() => handleCategoryClick(category)}
+              className={[
+                "h-[24px] shrink-0 rounded-[2px] border px-5 text-[11px] leading-none transition-colors cursor-pointer",
+                isSelected
+                  ? "border-[#2A0C00] bg-[#2A0C00] text-white"
+                  : "border-[#2A0C00] bg-white text-[#2A0C00] hover:bg-[#F8EAD8]",
+              ].join(" ")}
+            >
+              {category}
+            </button>
+          );
+        })}
       </div>
     </div>
   );
@@ -96,71 +125,161 @@ export function SortSelect() {
   );
 }
 
+import { useState, useEffect } from "react";
+
 export default function ProductFilters() {
   return (
-    <aside className="hidden w-[214px] shrink-0 text-[#2A0C00] md:block">
+    <Suspense fallback={<div className="hidden w-[214px] shrink-0 text-[#2A0C00] md:block">Loading filters...</div>}>
+      <ProductFiltersInner />
+    </Suspense>
+  );
+}
+
+function ProductFiltersInner() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Local state for filters
+  const [selectedSize, setSelectedSize] = useState("");
+  const [selectedFit, setSelectedFit] = useState("");
+  const [selectedFabric, setSelectedFabric] = useState("");
+  const [selectedColor, setSelectedColor] = useState("");
+  const [minPrice, setMinPrice] = useState(500);
+  const [maxPrice, setMaxPrice] = useState(2500);
+
+  // Sync state with URL parameters on mount/change
+  useEffect(() => {
+    setSelectedSize(searchParams.get("size") || "");
+    setSelectedFit(searchParams.get("fit") || "");
+    setSelectedFabric(searchParams.get("fabric") || "");
+    setSelectedColor(searchParams.get("color") || "");
+    setMinPrice(Number(searchParams.get("minPrice") || "500"));
+    setMaxPrice(Number(searchParams.get("maxPrice") || "2500"));
+  }, [searchParams]);
+
+  const applyFilters = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (selectedSize) params.set("size", selectedSize); else params.delete("size");
+    if (selectedFit) params.set("fit", selectedFit); else params.delete("fit");
+    if (selectedFabric) params.set("fabric", selectedFabric); else params.delete("fabric");
+    if (selectedColor) params.set("color", selectedColor); else params.delete("color");
+    params.set("minPrice", String(minPrice));
+    params.set("maxPrice", String(maxPrice));
+    
+    router.push(`?${params.toString()}`);
+  };
+
+  const clearFilters = () => {
+    setSelectedSize("");
+    setSelectedFit("");
+    setSelectedFabric("");
+    setSelectedColor("");
+    setMinPrice(500);
+    setMaxPrice(2500);
+    
+    const params = new URLSearchParams();
+    const cat = searchParams.get("category");
+    if (cat) params.set("category", cat);
+    
+    router.push(`?${params.toString()}`);
+  };
+
+  return (
+    <aside className="hidden w-[214px] shrink-0 text-[#2A0C00] md:block select-none">
       <h2 className="mb-5 text-[15px] font-medium">Filters</h2>
+      
       <FilterSection title="Size">
         <div className="grid grid-cols-4 gap-2">
-          {sizeOptions.map((size, index) => (
-            <FilterPill key={`${size}-${index}`}>{size}</FilterPill>
+          {Array.from(new Set(sizeOptions)).map((size) => (
+            <FilterPill 
+              key={size} 
+              active={selectedSize === size} 
+              onClick={() => setSelectedSize(selectedSize === size ? "" : size)}
+            >
+              {size}
+            </FilterPill>
           ))}
         </div>
       </FilterSection>
+
       <FilterSection title="Fit">
         <div className="flex flex-wrap gap-2">
-          {fitOptions.map((fit, index) => (
-            <FilterPill key={`${fit}-${index}`}>{fit}</FilterPill>
+          {fitOptions.map((fit) => (
+            <FilterPill 
+              key={fit} 
+              active={selectedFit === fit} 
+              onClick={() => setSelectedFit(selectedFit === fit ? "" : fit)}
+            >
+              {fit}
+            </FilterPill>
           ))}
         </div>
       </FilterSection>
+
       <FilterSection title="Fabric">
         <div className="flex flex-wrap gap-2">
-          {fabricOptions.map((fabric, index) => (
-            <FilterPill active={index === 0} key={`${fabric}-${index}`}>
+          {fabricOptions.map((fabric) => (
+            <FilterPill 
+              key={fabric} 
+              active={selectedFabric === fabric} 
+              onClick={() => setSelectedFabric(selectedFabric === fabric ? "" : fabric)}
+            >
               {fabric}
             </FilterPill>
           ))}
         </div>
       </FilterSection>
+
       <FilterSection title="Colour">
-        <div className="flex gap-2">
-          {colorOptions.map((color) => (
-            <button
-              key={color}
-              type="button"
-              aria-label={`Select color ${color}`}
-              className="size-[18px] rounded-full border border-[#C8BBAE]"
-              style={{ backgroundColor: color }}
-            />
-          ))}
+        <div className="flex flex-wrap gap-2">
+          {colorOptions.map((color) => {
+            const isSelected = selectedColor === color;
+            return (
+              <button
+                key={color}
+                type="button"
+                onClick={() => setSelectedColor(isSelected ? "" : color)}
+                aria-label={`Select color ${color}`}
+                className={`size-[18px] rounded-full border cursor-pointer transition-all ${
+                  isSelected ? "border-[#2A0C00] ring-2 ring-[#C18A48] scale-110" : "border-[#C8BBAE]"
+                }`}
+                style={{ backgroundColor: color }}
+              />
+            );
+          })}
         </div>
       </FilterSection>
+
       <FilterSection title="Price">
         <div className="pt-2">
-          <div className="relative h-1 rounded-full bg-[#E8D6C3]">
-            <span className="absolute inset-x-0 h-full rounded-full bg-[#C18A48]" />
-            <span className="absolute top-1/2 left-0 size-3 -translate-y-1/2 rounded-full border border-[#C18A48] bg-white" />
-            <span className="absolute top-1/2 right-0 size-3 -translate-y-1/2 rounded-full border border-[#C18A48] bg-white" />
-          </div>
-          <div className="mt-3 flex justify-between text-[10px] text-[#5B4032]">
-            <span>₹2,500</span>
-            <span>₹5,500</span>
+          <div className="relative flex flex-col gap-2">
+            <input
+              type="range"
+              min="500"
+              max="2500"
+              step="50"
+              value={maxPrice}
+              onChange={(e) => setMaxPrice(Number(e.target.value))}
+              className="w-full h-1 bg-[#E8D6C3] rounded-lg appearance-none cursor-pointer accent-[#C18A48]"
+            />
+            <div className="mt-2 flex justify-between text-[10px] text-[#5B4032] font-medium">
+              <span>Min: ₹500</span>
+              <span>Max: ₹{maxPrice.toLocaleString()}</span>
+            </div>
           </div>
         </div>
       </FilterSection>
-      <FilterSection title="Availability">
-        <div className="flex gap-2">
-          <FilterPill>In Stock</FilterPill>
-          <FilterPill>Out of Stock</FilterPill>
-        </div>
-      </FilterSection>
-      <Button className="mt-4 h-[38px] w-full rounded-[2px] bg-[#2A0C00] text-[12px] font-semibold text-white hover:bg-[#4A2313]">
+
+      <Button 
+        onClick={applyFilters}
+        className="mt-4 h-[38px] w-full rounded-[2px] bg-[#2A0C00] text-[12px] font-semibold text-white hover:bg-[#4A2313] cursor-pointer"
+      >
         Apply Filter
       </Button>
       <Button
         variant="outline"
-        className="mt-3 h-[36px] w-full rounded-[2px] border-[#2A0C00] bg-white text-[12px] font-semibold text-[#2A0C00] hover:bg-[#F8EAD8]"
+        onClick={clearFilters}
+        className="mt-3 h-[36px] w-full rounded-[2px] border-[#2A0C00] bg-white text-[12px] font-semibold text-[#2A0C00] hover:bg-[#F8EAD8] cursor-pointer"
       >
         Clear Filter
       </Button>
@@ -177,17 +296,10 @@ function FilterSection({
 }) {
   return (
     <section className="border-b border-[#E7DED4] py-4 first:pt-0">
-      <button
-        type="button"
-        className="mb-3 flex w-full items-center justify-between text-[12px] font-medium"
-      >
+      <h3 className="mb-3 text-[12px] font-medium text-[#2A0C00]">
         {title}
-        <IconChevronDown size={14} stroke={1.5} />
-      </button>
+      </h3>
       {children}
-      <button type="button" className="mt-3 text-[9px] text-[#6F574A]">
-        View More +
-      </button>
     </section>
   );
 }
@@ -195,18 +307,21 @@ function FilterSection({
 function FilterPill({
   children,
   active = false,
+  onClick,
 }: {
   children: React.ReactNode;
   active?: boolean;
+  onClick?: () => void;
 }) {
   return (
     <button
       type="button"
+      onClick={onClick}
       className={[
-        "min-h-[22px] rounded-[2px] border px-3 text-[9px] leading-none",
+        "min-h-[22px] rounded-[2px] border px-3 text-[9px] leading-none cursor-pointer transition-all",
         active
           ? "border-[#2A0C00] bg-[#2A0C00] text-white"
-          : "border-[#B8AA9B] bg-white text-[#2A0C00]",
+          : "border-[#B8AA9B] bg-white text-[#2A0C00] hover:bg-[#F8EAD8]",
       ].join(" ")}
     >
       {children}

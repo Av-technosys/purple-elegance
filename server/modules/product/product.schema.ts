@@ -2,11 +2,30 @@ import {
   boolean,
   integer,
   numeric,
+  pgEnum,
   pgTable,
   text,
   timestamp,
 } from "drizzle-orm/pg-core"
 import { categories } from "../category/category.schema"
+
+// ─── Gender Enum ──────────────────────────────────────────────────────────────────
+export const genderEnum = pgEnum("gender", ["men", "women", "kids"])
+
+// ─── Product Attributes ───────────────────────────────────────────────────────
+export const productAttributes = pgTable("product_attributes", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  productId: text("product_id")
+    .notNull()
+    .references(() => products.id, { onDelete: "cascade" }),
+  label: text("label").notNull(),                     
+  textContent: text("text_content"),                 
+  listItems: text("list_items").array(),             
+  sortOrder: integer("sort_order").default(0).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+})
 
 export const products = pgTable("products", {
   id: text("id")
@@ -20,6 +39,7 @@ export const products = pgTable("products", {
   categoryId: text("category_id").references(() => categories.id, {
     onDelete: "set null",
   }),
+  gender: genderEnum("gender"),                          // men | women | kids
   stock: integer("stock").default(0).notNull(),
   sku: text("sku").unique(),
   tags: text("tags").array(),                            // ["kurta", "cotton", "summer"]

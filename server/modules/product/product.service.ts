@@ -1,6 +1,20 @@
 import { productRepository } from "./product.repository"
 import { createProductSchema, updateProductSchema } from "./product.validations"
 import type { CreateProductInput, UpdateProductInput } from "./product.validations"
+import { getS3ObjectPreviewUrl } from "@/lib/s3"
+
+function extractS3Key(url: string): string {
+  if (!url) return ""
+  if (!url.startsWith("http://") && !url.startsWith("https://")) {
+    return url
+  }
+  try {
+    const parsed = new URL(url)
+    return parsed.pathname.substring(1) // Strip leading slash
+  } catch {
+    return url
+  }
+}
 
 export const productService = {
 
@@ -18,26 +32,54 @@ export const productService = {
           ? false
           : undefined
 
-    return productRepository.findPaginated({
+    const result = await productRepository.findPaginated({
       page: params.page,
       pageSize: params.pageSize,
       search: params.search,
       categorySlug: params.category,
       isActive,
     })
+
+    return {
+      ...result,
+      items: result.items.map((item) => ({
+        ...item,
+        image: item.image ? getS3ObjectPreviewUrl(item.image) : null,
+      })),
+    }
   },
 
   getById: async (id: string) => {
     const product = await productRepository.findById(id)
     if (!product) throw new Error("Product not found")
-    return product
+    
+    return {
+      ...product,
+      images: product.images.map((img) => ({
+        ...img,
+        url: getS3ObjectPreviewUrl(img.url),
+      })),
+    }
+  },
+
+  getBySlug: async (slug: string) => {
+    const product = await productRepository.findBySlug(slug)
+    if (!product) throw new Error("Product not found")
+    
+    return {
+      ...product,
+      images: product.images.map((img) => ({
+        ...img,
+        url: getS3ObjectPreviewUrl(img.url),
+      })),
+    }
   },
 
   create: async (input: CreateProductInput) => {
     const parsed = createProductSchema.safeParse(input)
     if (!parsed.success) throw new Error(JSON.stringify(parsed.error.flatten().fieldErrors))
 
-    const { images, ...productData } = parsed.data
+    const { images, attributes, ...productData } = parsed.data
 
     const product = await productRepository.create({
       name: productData.name,
@@ -46,6 +88,7 @@ export const productService = {
       price: productData.price,
       comparePrice: productData.comparePrice || null,
       categoryId: productData.categoryId ?? null,
+      gender: productData.gender ?? null,
       stock: productData.stock,
       sku: productData.sku ?? null,
       tags: productData.tags ?? null,
@@ -55,9 +98,12 @@ export const productService = {
       isActive: productData.isActive,
     })
 
-    // Attach images if provided
     if (images && images.length > 0) {
-      await productRepository.setImages(product.id, images)
+      const keys = images.map((url) => extractS3Key(url))
+      await productRepository.setImages(product.id, keys)
+    }
+    if (attributes && attributes.length > 0) {
+      await productRepository.setAttributes(product.id, attributes)
     }
 
     return product
@@ -70,20 +116,24 @@ export const productService = {
     const existing = await productRepository.findById(id)
     if (!existing) throw new Error("Product not found")
 
-    const { images, ...productData } = parsed.data
+    const { images, attributes, ...productData } = parsed.data
 
     const product = await productRepository.update(id, {
       ...productData,
       price: productData.price,
       comparePrice: productData.comparePrice || null,
       categoryId: productData.categoryId ?? null,
+      gender: productData.gender ?? null,
       sku: productData.sku ?? null,
       tags: productData.tags ?? null,
     })
 
-    // Update images if provided
     if (images && images.length > 0) {
-      await productRepository.setImages(id, images)
+      const keys = images.map((url) => extractS3Key(url))
+      await productRepository.setImages(id, keys)
+    }
+    if (attributes && attributes.length > 0) {
+      await productRepository.setAttributes(id, attributes)
     }
 
     return product
@@ -95,3 +145,4 @@ export const productService = {
     await productRepository.delete(id)
   },
 }
+

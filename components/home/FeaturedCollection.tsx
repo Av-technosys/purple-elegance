@@ -8,22 +8,26 @@ import { motion } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useGenderTheme } from "@/helper/useGenderTheme";
 
-const collections = [
+const collectionsData = [
   {
     title: "Festive Collection",
+    categoryKey: "Festive Collection",
     description: "Celebrate in style with prints that speak elegance",
     image: "/sample-product.png",
     position: "object-[center_34%]",
   },
   {
     title: "Co-ord Sets",
+    categoryKey: "Kurta Sets",
     description: "Celebrate in style with prints that speak elegance",
     image: "/sample-product.png",
     position: "object-[center_18%]",
   },
   {
     title: "Floral Anarkali",
+    categoryKey: "Anarkali Suits",
     description: "Celebrate in style with prints that speak elegance",
     image: "/sample-product.png",
     position: "object-[center_28%]",
@@ -31,20 +35,21 @@ const collections = [
   },
   {
     title: "Embroidered Suit",
+    categoryKey: "Ethnic Wear",
     description: "Celebrate in style with prints that speak elegance",
     image: "/sample-product.png",
     position: "object-[center_42%]",
   },
   {
     title: "Everyday Elegance",
+    categoryKey: "Kurtis",
     description: "Celebrate in style with prints that speak elegance",
     image: "/sample-product.png",
     position: "object-[center_55%]",
   },
 ];
 
-const getWrappedOffset = (index: number, activeIndex: number) => {
-  const count = collections.length;
+const getWrappedOffset = (index: number, activeIndex: number, count: number) => {
   const rawOffset = (index - activeIndex + count) % count;
 
   return rawOffset > Math.floor(count / 2) ? rawOffset - count : rawOffset;
@@ -52,6 +57,8 @@ const getWrappedOffset = (index: number, activeIndex: number) => {
 
 export default function FeaturedCollection() {
   const [activeIndex, setActiveIndex] = useState(2);
+  const theme = useGenderTheme();
+  const collections = theme.featuredCollections;
 
   const move = (direction: "next" | "previous") => {
     setActiveIndex((current) => {
@@ -108,7 +115,7 @@ export default function FeaturedCollection() {
 
           <div className="relative mx-auto h-[360px] max-w-[1040px] overflow-hidden sm:h-[438px]">
             {collections.map((collection, index) => {
-              const offset = getWrappedOffset(index, activeIndex);
+              const offset = getWrappedOffset(index, activeIndex, collections.length);
               const isActive = offset === 0;
               const isInnerCard = Math.abs(offset) === 1;
               const xPositionByOffset = {
@@ -192,7 +199,7 @@ export default function FeaturedCollection() {
 
                     {isActive ? (
                       <Link
-                        href="/product"
+                        href={`/product?category=${encodeURIComponent(collection.categoryKey)}`}
                         className="mt-7 inline-flex h-[42px] items-center gap-2 rounded-[4px] bg-[#fff2df] px-7 text-[10px] font-semibold tracking-wider text-[#2A0C00] transition-colors hover:bg-white"
                       >
                         EXPLORE COLLECTION

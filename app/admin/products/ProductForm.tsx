@@ -2,8 +2,9 @@
 
 import { FormEvent, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { toast } from "sonner";
-import { Plus, Trash2, X } from "lucide-react";
+import { Plus, Trash2, X, UploadCloud } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -11,8 +12,16 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { createProduct, updateProduct } from "@/helper/product/action";
 import { useFileUpload } from "@/helper/upload/client";
+import { cn } from "@/lib/utils";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
+
+type AttributeRow = {
+  label: string;
+  textContent: string;
+  listInput: string;      // raw textarea input (newline-separated)
+  listItems: string[];    // parsed array
+};
 
 type ProductFormProps = {
   product?: {
@@ -30,7 +39,15 @@ type ProductFormProps = {
     isNewArrival?: boolean;
     isActive?: boolean;
     categoryId?: string | null;
+    gender?: "men" | "women" | "kids" | null;
     images?: { url: string; isPrimary: boolean }[];
+    attributes?: {
+      id: string;
+      label: string;
+      textContent?: string | null;
+      listItems?: string[] | null;
+      sortOrder: number;
+    }[];
   };
 };
 
@@ -67,11 +84,46 @@ export default function ProductForm({ product }: ProductFormProps) {
   const [isBestSeller, setIsBestSeller] = useState(Boolean(product?.isBestSeller));
   const [isNewArrival, setIsNewArrival] = useState(Boolean(product?.isNewArrival));
   const [isActive, setIsActive] = useState(product?.isActive ?? true);
+  const [gender, setGender] = useState<"men" | "women" | "kids" | "">(product?.gender ?? "");
   // Initialize with existing image URLs
   // Initialize with existing image URLs (first is primary, rest are media)
   const initialImages = product?.images?.map((i) => i.url) ?? [];
   const [primaryImage, setPrimaryImage] = useState<string>(initialImages[0] ?? "");
   const [mediaImages, setMediaImages] = useState<string[]>(initialImages.slice(1));
+
+  // ── Attributes state ─────────────────────────────────────────────────────
+  const [attributes, setAttributes] = useState<AttributeRow[]>(
+    (product?.attributes ?? []).map((a) => ({
+      label: a.label,
+      textContent: a.textContent ?? "",
+      listInput: (a.listItems ?? []).join("\n"),
+      listItems: a.listItems ?? [],
+    }))
+  );
+
+  function addAttribute() {
+    setAttributes((prev) => [...prev, { label: "", textContent: "", listInput: "", listItems: [] }]);
+  }
+
+  function removeAttribute(index: number) {
+    setAttributes((prev) => prev.filter((_, i) => i !== index));
+  }
+
+  function updateAttribute(index: number, field: keyof AttributeRow, value: string) {
+    setAttributes((prev) =>
+      prev.map((row, i) => {
+        if (i !== index) return row;
+        if (field === "listInput") {
+          return {
+            ...row,
+            listInput: value,
+            listItems: value.split("\n").map((s) => s.trim()).filter(Boolean),
+          };
+        }
+        return { ...row, [field]: value };
+      })
+    );
+  }
 
   // ── Auto-slug from name (only when creating) ─────────────────────────────
   function handleNameChange(value: string) {
@@ -144,12 +196,9 @@ export default function ProductForm({ product }: ProductFormProps) {
     event.preventDefault();
 
     // Combine primary image and media images
-    let finalImages: string[] | undefined = undefined;
-    if (primaryImage || mediaImages.length > 0) {
-      finalImages = [];
-      if (primaryImage) finalImages.push(primaryImage);
-      if (mediaImages.length > 0) finalImages.push(...mediaImages);
-    }
+    const finalImages: string[] = [];
+    if (primaryImage) finalImages.push(primaryImage);
+    if (mediaImages.length > 0) finalImages.push(...mediaImages);
 
     const payload = {
       name,
@@ -164,7 +213,16 @@ export default function ProductForm({ product }: ProductFormProps) {
       isBestSeller,
       isNewArrival,
       isActive,
+      gender: (gender || undefined) as "men" | "women" | "kids" | undefined,
       images: finalImages,
+      attributes: attributes
+        .filter((a) => a.label.trim())
+        .map((a, i) => ({
+          label: a.label.trim(),
+          textContent: a.textContent.trim() || null,
+          listItems: a.listItems.length > 0 ? a.listItems : null,
+          sortOrder: i,
+        })),
     };
 
     startTransition(async () => {
@@ -187,43 +245,50 @@ export default function ProductForm({ product }: ProductFormProps) {
   return (
     <form onSubmit={submit} className="grid gap-6">
       {/* Header */}
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200/60">
         <div>
-          <h1 className="text-2xl font-semibold">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
             {isEdit ? "Edit Product" : "Add Product"}
           </h1>
-          <p className="text-sm text-muted-foreground">
-            All fields match the current products schema.
+          <p className="text-sm text-slate-500 mt-1">
+            Complete the form fields below to manage the product details.
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-3 shrink-0">
           <Button
             type="button"
             variant="outline"
             onClick={() => router.push("/admin/products")}
+            className="h-10 px-4 rounded-lg border-slate-200 hover:bg-slate-50 text-slate-700 font-medium transition-all"
           >
             Cancel
           </Button>
-          <Button type="submit" disabled={isPending || uploading}>
+          <Button 
+            type="submit" 
+            disabled={isPending || uploading}
+            className="h-10 px-5 rounded-lg bg-violet-600 hover:bg-violet-700 text-white font-medium shadow-sm transition-all active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none"
+          >
             {isPending ? "Saving…" : "Save Product"}
           </Button>
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_20rem]">
+      <div className="grid gap-6 lg:grid-cols-[1fr_22rem]">
         {/* Left column */}
         <div className="grid gap-6">
           {/* Basic info */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Basic Info</CardTitle>
+          <Card className="border border-slate-200/80 shadow-xs rounded-xl overflow-hidden">
+            <CardHeader className="bg-slate-50/50 border-b border-slate-100 px-6 py-4">
+              <CardTitle className="text-base font-semibold text-slate-900">Basic Information</CardTitle>
             </CardHeader>
-            <CardContent className="grid gap-4 md:grid-cols-2">
+            <CardContent className="p-6 grid gap-5 md:grid-cols-2">
               <Field label="Name" required>
                 <Input
                   value={name}
                   onChange={(e) => handleNameChange(e.target.value)}
                   required
+                  className="h-10 rounded-lg border-slate-200 focus-visible:border-violet-600 focus-visible:ring-violet-600/15 transition-all placeholder:text-slate-400"
+                  placeholder="e.g. Traditional Cotton Kurta"
                 />
               </Field>
 
@@ -232,7 +297,8 @@ export default function ProductForm({ product }: ProductFormProps) {
                   value={slug}
                   onChange={(e) => setSlug(e.target.value)}
                   required
-                  placeholder="auto-generated from name"
+                  className="h-10 rounded-lg border-slate-200 focus-visible:border-violet-600 focus-visible:ring-violet-600/15 transition-all placeholder:text-slate-400"
+                  placeholder="auto-generated-from-name"
                 />
               </Field>
 
@@ -240,6 +306,7 @@ export default function ProductForm({ product }: ProductFormProps) {
                 <Input
                   value={sku}
                   onChange={(e) => setSku(e.target.value)}
+                  className="h-10 rounded-lg border-slate-200 focus-visible:border-violet-600 focus-visible:ring-violet-600/15 transition-all placeholder:text-slate-400"
                   placeholder="e.g. PE-KURTA-001"
                 />
               </Field>
@@ -250,6 +317,7 @@ export default function ProductForm({ product }: ProductFormProps) {
                   min="0"
                   value={stock}
                   onChange={(e) => setStock(e.target.value)}
+                  className="h-10 rounded-lg border-slate-200 focus-visible:border-violet-600 focus-visible:ring-violet-600/15 transition-all"
                 />
               </Field>
 
@@ -257,54 +325,89 @@ export default function ProductForm({ product }: ProductFormProps) {
                 <Textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="min-h-28"
+                  className="min-h-32 rounded-lg border-slate-200 focus-visible:border-violet-600 focus-visible:ring-violet-600/15 transition-all placeholder:text-slate-400 resize-y"
+                  placeholder="Describe the product details, fit, material, and care instructions..."
                 />
               </Field>
             </CardContent>
           </Card>
 
           {/* Pricing */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Pricing</CardTitle>
+          <Card className="border border-slate-200/80 shadow-xs rounded-xl overflow-hidden">
+            <CardHeader className="bg-slate-50/50 border-b border-slate-100 px-6 py-4">
+              <CardTitle className="text-base font-semibold text-slate-900">Pricing</CardTitle>
             </CardHeader>
-            <CardContent className="grid gap-4 md:grid-cols-2">
-              <Field label="Price (₹)" required>
-                <Input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
-                  required
-                  placeholder="e.g. 1299"
-                />
+            <CardContent className="p-6 grid gap-5 md:grid-cols-2">
+              <Field label="Price" required>
+                <div className="relative flex h-10 w-full min-w-0 items-stretch rounded-lg border border-slate-200 bg-background shadow-xs focus-within:border-violet-600 focus-within:ring-3 focus-within:ring-violet-600/15 transition-all">
+                  <div className="flex items-center justify-center border-r border-slate-200 bg-slate-50/80 px-3 text-slate-500 font-medium text-sm select-none rounded-l-lg shrink-0">
+                    ₹
+                  </div>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={price}
+                    onChange={(e) => setPrice(e.target.value)}
+                    required
+                    className="flex-1 bg-transparent px-3 py-2 text-sm outline-none placeholder:text-slate-400 text-slate-900"
+                    placeholder="e.g. 1299.00"
+                  />
+                </div>
               </Field>
 
-              <Field label="Compare Price (₹)">
-                <Input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={comparePrice}
-                  onChange={(e) => setComparePrice(e.target.value)}
-                  placeholder="MRP / strike-through price"
-                />
+              <Field label="Compare Price">
+                <div className="relative flex h-10 w-full min-w-0 items-stretch rounded-lg border border-slate-200 bg-background shadow-xs focus-within:border-violet-600 focus-within:ring-3 focus-within:ring-violet-600/15 transition-all">
+                  <div className="flex items-center justify-center border-r border-slate-200 bg-slate-50/80 px-3 text-slate-500 font-medium text-sm select-none rounded-l-lg shrink-0">
+                    ₹
+                  </div>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={comparePrice}
+                    onChange={(e) => setComparePrice(e.target.value)}
+                    className="flex-1 bg-transparent px-3 py-2 text-sm outline-none placeholder:text-slate-400 text-slate-900"
+                    placeholder="MRP / strike-through price"
+                  />
+                </div>
               </Field>
             </CardContent>
           </Card>
 
           {/* Tags */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Tags</CardTitle>
+          <Card className="border border-slate-200/80 shadow-xs rounded-xl overflow-hidden">
+            <CardHeader className="bg-slate-50/50 border-b border-slate-100 px-6 py-4">
+              <CardTitle className="text-base font-semibold text-slate-900">Classification</CardTitle>
             </CardHeader>
-            <CardContent className="grid gap-3">
+            <CardContent className="p-6">
+              <Field label="Gender / Section">
+                <select
+                  value={gender}
+                  onChange={(e) => setGender(e.target.value as "men" | "women" | "kids" | "")}
+                  className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-violet-600 focus:outline-none focus:ring-2 focus:ring-violet-600/15 transition-all"
+                >
+                  <option value="">— None —</option>
+                  <option value="men">Men</option>
+                  <option value="women">Women</option>
+                  <option value="kids">Kids</option>
+                </select>
+              </Field>
+            </CardContent>
+          </Card>
+
+          {/* Tags */}
+          <Card className="border border-slate-200/80 shadow-xs rounded-xl overflow-hidden">
+            <CardHeader className="bg-slate-50/50 border-b border-slate-100 px-6 py-4">
+              <CardTitle className="text-base font-semibold text-slate-900">Tags</CardTitle>
+            </CardHeader>
+            <CardContent className="p-6 space-y-4">
               <div className="flex gap-2">
                 <Input
                   value={tagInput}
                   onChange={(e) => setTagInput(e.target.value)}
                   placeholder="e.g. kurta, cotton, summer"
+                  className="h-10 rounded-lg border-slate-200 focus-visible:border-violet-600 focus-visible:ring-violet-600/15 transition-all"
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
                       e.preventDefault();
@@ -312,111 +415,205 @@ export default function ProductForm({ product }: ProductFormProps) {
                     }
                   }}
                 />
-                <Button type="button" variant="outline" onClick={addTag}>
-                  <Plus />
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={addTag}
+                  className="h-10 px-4 rounded-lg border-slate-200 hover:bg-slate-50 flex items-center gap-1.5 transition-all text-slate-700 font-medium shrink-0"
+                >
+                  <Plus className="size-4" />
                   Add
                 </Button>
               </div>
-              {tags.length > 0 && (
-                <div className="flex flex-wrap gap-2">
+              {tags.length > 0 ? (
+                <div className="flex flex-wrap gap-2 pt-1">
                   {tags.map((tag) => (
                     <span
                       key={tag}
-                      className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1 text-sm text-slate-700"
+                      className="inline-flex items-center gap-1.5 rounded-full bg-violet-50/60 border border-violet-100 px-3 py-1 text-sm font-medium text-violet-700 transition-colors hover:bg-violet-100/50"
                     >
                       {tag}
                       <button
                         type="button"
                         onClick={() => removeTag(tag)}
-                        className="text-slate-400 hover:text-slate-700"
+                        className="text-violet-400 hover:text-violet-700 transition-colors rounded-full focus:outline-hidden"
                       >
-                        <X className="size-3" />
+                        <X className="size-3.5" />
                       </button>
                     </span>
                   ))}
                 </div>
+              ) : (
+                <p className="text-xs text-slate-400">No tags added yet. Enter a tag name and click Add or press Enter.</p>
               )}
             </CardContent>
           </Card>
 
           {/* Primary Image */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Primary Image</CardTitle>
+          <Card className="border border-slate-200/80 shadow-xs rounded-xl overflow-hidden">
+            <CardHeader className="bg-slate-50/50 border-b border-slate-100 px-6 py-4">
+              <CardTitle className="text-base font-semibold text-slate-900">Primary Cover Image</CardTitle>
             </CardHeader>
-            <CardContent className="grid gap-3 md:grid-cols-[6rem_1fr_auto] md:items-center">
-              <div className="size-24 overflow-hidden rounded-md border bg-muted">
-                {primaryImage ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={primaryImage}
-                    alt="Primary product cover"
-                    className="size-full object-cover"
+            <CardContent className="p-6">
+              {primaryImage ? (
+                <div className="flex flex-col sm:flex-row items-center gap-4 p-4 rounded-xl border border-slate-100 bg-slate-50/30">
+                  <div className="relative size-24 shrink-0 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-xs">
+                    <Image
+                      src={primaryImage}
+                      alt="Primary product cover"
+                      fill
+                      unoptimized
+                      className="object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setPrimaryImage("")}
+                      className="absolute right-1 top-1 flex size-6 items-center justify-center rounded-full bg-black/60 text-white hover:bg-red-500 transition-colors shadow-xs"
+                      title="Remove image"
+                    >
+                      <X className="size-3.5" />
+                    </button>
+                  </div>
+                  <div className="min-w-0 flex-1 space-y-0.5">
+                    <p className="text-sm font-semibold text-slate-800 truncate">
+                      {primaryImage.split("/").pop() || "Primary Cover Image"}
+                    </p>
+                    <p className="text-xs text-emerald-600 font-medium">Cover image selected successfully</p>
+                  </div>
+                  <label className="inline-flex h-9 cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white px-4 text-sm font-medium text-slate-700 shadow-xs transition hover:bg-slate-50 active:scale-[0.98]">
+                    <Plus className="size-4" />
+                    Change Cover
+                    <input
+                      type="file"
+                      hidden
+                      accept="image/*"
+                      onChange={(e) => handlePrimaryImageUpload(e.target.files?.[0])}
+                    />
+                  </label>
+                </div>
+              ) : (
+                <label className="flex flex-col items-center justify-center border-2 border-dashed border-slate-200/80 rounded-xl p-8 cursor-pointer hover:border-violet-500 hover:bg-violet-50/10 transition-all bg-slate-50/40 group">
+                  <UploadCloud className="w-10 h-10 text-slate-400 mb-2 group-hover:text-violet-500 transition-colors" />
+                  <span className="text-sm font-semibold text-slate-700 group-hover:text-violet-600 transition-colors">
+                    {uploading ? "Uploading cover image..." : "Upload Primary Cover Image"}
+                  </span>
+                  <span className="text-xs text-slate-400 mt-1">PNG, JPG or WEBP up to 5MB</span>
+                  <input
+                    type="file"
+                    hidden
+                    accept="image/*"
+                    onChange={(e) => handlePrimaryImageUpload(e.target.files?.[0])}
                   />
-                ) : null}
-              </div>
-              <span className="min-w-0 truncate rounded-md border border-input px-3 py-2 text-sm text-muted-foreground">
-                {primaryImage || "No primary image uploaded"}
-              </span>
-              <label className="inline-flex h-9 cursor-pointer items-center justify-center gap-1 rounded-md border border-border bg-background px-2.5 text-sm font-medium shadow-xs transition hover:bg-muted">
-                <Plus />
-                {uploading ? "Uploading…" : "Upload"}
-                <input
-                  type="file"
-                  hidden
-                  accept="image/*"
-                  onChange={(e) => handlePrimaryImageUpload(e.target.files?.[0])}
-                />
-              </label>
+                </label>
+              )}
             </CardContent>
           </Card>
 
           {/* Additional Media */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Additional Media</CardTitle>
+          <Card className="border border-slate-200/80 shadow-xs rounded-xl overflow-hidden">
+            <CardHeader className="bg-slate-50/50 border-b border-slate-100 px-6 py-4">
+              <CardTitle className="text-base font-semibold text-slate-900">Additional Gallery Media</CardTitle>
             </CardHeader>
-            <CardContent className="grid gap-4">
+            <CardContent className="p-6 space-y-6">
               {/* Media Previews */}
               {mediaImages.length > 0 && (
-                <div className="flex flex-wrap gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-4">
                   {mediaImages.map((mediaUrl, idx) => (
-                    <div key={idx} className="relative size-24 overflow-hidden rounded-md border bg-muted">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
+                    <div key={idx} className="group relative aspect-square overflow-hidden rounded-xl border border-slate-200 bg-slate-50 shadow-xs transition hover:shadow-sm">
+                      <Image
                         src={mediaUrl}
                         alt={`Media ${idx + 1}`}
-                        className="size-full object-cover"
+                        fill
+                        unoptimized
+                        className="object-cover transition-transform duration-300 group-hover:scale-105"
                       />
                       <button
                         type="button"
                         onClick={() => removeMediaImage(idx)}
-                        className="absolute right-1 top-1 flex size-5 items-center justify-center rounded-full bg-black/50 text-white hover:bg-red-500"
+                        className="absolute right-2 top-2 flex size-6 items-center justify-center rounded-full bg-black/60 text-white hover:bg-red-500 transition-all opacity-0 group-hover:opacity-100 shadow-xs"
                         title="Remove image"
                       >
-                        <X className="size-3" />
+                        <X className="size-3.5" />
                       </button>
+                      <div className="absolute bottom-2 left-2 rounded-md bg-black/55 px-2 py-0.5 text-[10px] font-semibold text-white backdrop-blur-xs">
+                        #{idx + 1}
+                      </div>
                     </div>
                   ))}
                 </div>
               )}
               
-              <div className="flex items-center gap-4">
-                <label className="inline-flex h-9 cursor-pointer items-center justify-center gap-1 rounded-md border border-border bg-background px-4 text-sm font-medium shadow-xs transition hover:bg-muted">
-                  <Plus className="size-4" />
-                  {uploading ? "Uploading…" : "Add Media"}
-                  <input
-                    type="file"
-                    hidden
-                    multiple
-                    accept="image/*"
-                    onChange={(e) => handleMediaUpload(e.target.files)}
-                  />
-                </label>
-                <span className="text-sm text-muted-foreground">
-                  Upload additional gallery images for this product.
+              <label className="flex flex-col items-center justify-center border-2 border-dashed border-slate-200/80 rounded-xl p-8 cursor-pointer hover:border-violet-500 hover:bg-violet-50/10 transition-all bg-slate-50/40 group">
+                <Plus className="w-8 h-8 text-slate-400 mb-2 group-hover:text-violet-500 transition-colors" />
+                <span className="text-sm font-semibold text-slate-700 group-hover:text-violet-600 transition-colors">
+                  {uploading ? "Uploading media files..." : "Add Gallery Images"}
                 </span>
-              </div>
+                <span className="text-xs text-slate-400 mt-1">Select one or multiple images for details gallery</span>
+                <input
+                  type="file"
+                  hidden
+                  multiple
+                  accept="image/*"
+                  onChange={(e) => handleMediaUpload(e.target.files)}
+                />
+              </label>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Attributes */}
+        <div className="col-span-full">
+          <Card className="border border-slate-200/80 shadow-xs rounded-xl overflow-hidden">
+            <CardHeader className="bg-slate-50/50 border-b border-slate-100 px-6 py-4 flex flex-row items-center justify-between">
+              <CardTitle className="text-base font-semibold text-slate-900">Product Attributes</CardTitle>
+              <button
+                type="button"
+                onClick={addAttribute}
+                className="flex items-center gap-1.5 text-sm font-semibold text-violet-600 hover:text-violet-800 transition-colors"
+              >
+                <Plus className="size-4" /> Add Attribute
+              </button>
+            </CardHeader>
+            <CardContent className="p-6 grid gap-4">
+              {attributes.length === 0 && (
+                <p className="text-sm text-slate-400 text-center py-4">No attributes yet. Click &quot;Add Attribute&quot; to add PDP sections like FABRIC, CARE INSTRUCTIONS, etc.</p>
+              )}
+              {attributes.map((attr, idx) => (
+                <div key={idx} className="grid gap-3 rounded-lg border border-slate-200 p-4 relative">
+                  <button
+                    type="button"
+                    onClick={() => removeAttribute(idx)}
+                    className="absolute right-3 top-3 text-slate-400 hover:text-red-500 transition-colors"
+                  >
+                    <Trash2 className="size-4" />
+                  </button>
+                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                    <Field label="Label" required>
+                      <Input
+                        value={attr.label}
+                        onChange={(e) => updateAttribute(idx, "label", e.target.value)}
+                        placeholder="e.g. FABRIC, CARE INSTRUCTIONS"
+                      />
+                    </Field>
+                    <Field label="Text / Single Value">
+                      <Input
+                        value={attr.textContent}
+                        onChange={(e) => updateAttribute(idx, "textContent", e.target.value)}
+                        placeholder="e.g. 100% Cotton Twill"
+                      />
+                    </Field>
+                  </div>
+                  <Field label="Bullet List Items (one per line)">
+                    <Textarea
+                      value={attr.listInput}
+                      onChange={(e) => updateAttribute(idx, "listInput", e.target.value)}
+                      placeholder={`Machine wash cold\nDo not bleach\nTumble dry low`}
+                      rows={4}
+                      className="resize-none font-mono text-sm"
+                    />
+                  </Field>
+                </div>
+              ))}
             </CardContent>
           </Card>
         </div>
@@ -424,43 +621,47 @@ export default function ProductForm({ product }: ProductFormProps) {
         {/* Right column — toggles */}
         <div className="grid content-start gap-6">
           {/* Status */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Visibility</CardTitle>
+          <Card className="border border-slate-200/80 shadow-xs rounded-xl overflow-hidden">
+            <CardHeader className="bg-slate-50/50 border-b border-slate-100 px-6 py-4">
+              <CardTitle className="text-base font-semibold text-slate-900">Visibility Status</CardTitle>
             </CardHeader>
-            <CardContent className="grid gap-3">
+            <CardContent className="p-4 grid gap-3">
               <Toggle
                 id="isActive"
                 checked={isActive}
                 onChange={setIsActive}
-                label="Active (visible in store)"
+                label="Active Status"
+                description="Show this product publicly in store catalog."
               />
             </CardContent>
           </Card>
 
           {/* Badges */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Badges</CardTitle>
+          <Card className="border border-slate-200/80 shadow-xs rounded-xl overflow-hidden">
+            <CardHeader className="bg-slate-50/50 border-b border-slate-100 px-6 py-4">
+              <CardTitle className="text-base font-semibold text-slate-900">Product Badges</CardTitle>
             </CardHeader>
-            <CardContent className="grid gap-3">
+            <CardContent className="p-4 grid gap-4">
               <Toggle
                 id="isFeatured"
                 checked={isFeatured}
                 onChange={setIsFeatured}
-                label="Featured"
+                label="Featured Product"
+                description="Highlight on home page featured collection."
               />
               <Toggle
                 id="isBestSeller"
                 checked={isBestSeller}
                 onChange={setIsBestSeller}
                 label="Best Seller"
+                description="Display a best-seller badge to increase sales."
               />
               <Toggle
                 id="isNewArrival"
                 checked={isNewArrival}
                 onChange={setIsNewArrival}
                 label="New Arrival"
+                description="Show new badge for freshly stocked products."
               />
             </CardContent>
           </Card>
@@ -499,22 +700,31 @@ function Toggle({
   checked,
   onChange,
   label,
+  description,
 }: {
   id: string;
   checked: boolean;
   onChange: (v: boolean) => void;
   label: string;
+  description?: string;
 }) {
   return (
-    <label htmlFor={id} className="flex cursor-pointer items-center gap-3">
-      <input
-        id={id}
-        type="checkbox"
-        checked={checked}
-        onChange={(e) => onChange(e.target.checked)}
-        className="h-4 w-4 rounded border-gray-300 accent-violet-600"
-      />
-      <span className="text-sm">{label}</span>
-    </label>
+    <div className="flex items-start gap-3">
+      <div className="flex h-5 items-center">
+        <input
+          id={id}
+          type="checkbox"
+          checked={checked}
+          onChange={(e) => onChange(e.target.checked)}
+          className="h-4 w-4 rounded border-slate-300 accent-violet-600 focus:ring-violet-600 focus:ring-offset-0 cursor-pointer"
+        />
+      </div>
+      <label htmlFor={id} className="cursor-pointer select-none">
+        <span className="block text-sm font-semibold text-slate-800">{label}</span>
+        {description && (
+          <span className="block text-xs text-slate-400 mt-0.5">{description}</span>
+        )}
+      </label>
+    </div>
   );
 }

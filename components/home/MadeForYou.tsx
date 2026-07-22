@@ -2,8 +2,11 @@
 
 import Image from "next/image"
 import { motion } from "framer-motion"
+import { useGenderTheme } from "@/helper/useGenderTheme"
 
 export default function MadeForYou() {
+  const theme = useGenderTheme()
+
   return (
     <section className="relative w-full overflow-hidden bg-[#f5e8d8]">
       {/* Container aspect ratio dynamically shifted for mobile vs desktop */}
@@ -12,7 +15,7 @@ export default function MadeForYou() {
         {/* Mobile Background Image (As per attached layout mockup) */}
         <div className="block sm:hidden absolute inset-0">
           <Image
-            src="/madefor-mobile.png"
+            src={theme.madeforBgMobile}
             alt="Rooted in tradition collection mobile"
             fill
             priority
@@ -24,7 +27,7 @@ export default function MadeForYou() {
         {/* Desktop Background Image (Web remains completely untouched) */}
         <div className="hidden sm:block absolute inset-0">
           <Image
-            src="/madefor.png"
+            src={theme.madeforBgDesktop}
             alt="Rooted in tradition collection"
             fill
             priority

@@ -1,12 +1,10 @@
-import Image from "next/image";
-
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 export type HeaderAccountUser = {
   name: string;
   email: string;
-  avatar: string;
+  avatar?: string | null;
 };
 
 export default function HeaderAccount({
@@ -15,17 +13,9 @@ export default function HeaderAccount({
   user?: HeaderAccountUser | null;
 }) {
   if (user) {
+
     return (
-      <div className="flex items-center gap-3">
-        <div className="relative size-[46px] overflow-hidden rounded-full bg-[#E8D0B4]">
-          <Image
-            src={user.avatar}
-            alt={user.name}
-            fill
-            className="object-cover object-[50%_20%]"
-            sizes="46px"
-          />
-        </div>
+      <div className="flex items-center gap-1 py-1">
         <div className="min-w-0 text-[#140A05]">
           <p className="truncate text-[20px] leading-tight font-semibold">
             {user.name}
@@ -39,18 +29,16 @@ export default function HeaderAccount({
   }
 
   return (
-    <div className="grid grid-cols-2 gap-0">
-     
-      <Button asChild className="h-[35px] rounded-none bg-[#351300] text-[12px] font-semibold text-white hover:bg-[#4A1B04]">
+    <div className="grid grid-cols-2 gap-3">
+      <Button asChild className="h-[36px] rounded-[3px] bg-[#351300] text-[12px] font-semibold text-white hover:bg-[#4A1B04] cursor-pointer">
         <Link href={"/login"}> Login</Link>
       </Button>
-  
       <Button
         asChild
         variant="outline"
-        className="h-[35px] rounded-none border-[#351300] bg-white text-[12px] font-semibold text-[#140A05] hover:bg-[#F8EAD8]"
+        className="h-[36px] rounded-[3px] border-[#351300] bg-white text-[12px] font-semibold text-[#140A05] hover:bg-[#F8EAD8] cursor-pointer"
       >
-       <Link href={"/register"}>  Sign Up</Link>
+        <Link href={"/register"}>  Sign Up</Link>
       </Button>
     </div>
   );
