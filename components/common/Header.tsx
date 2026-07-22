@@ -345,6 +345,7 @@ const Header = ({ user }: HeaderProps) => {
                   ))}
                 </div>
               </nav>
+            </nav>
 
               <div className="mt-auto space-y-2 pb-3">
                 <Button
